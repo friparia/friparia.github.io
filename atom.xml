@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-03-28T23:38:33+08:00</updated>
+  <updated>2014-03-28T23:42:43+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -12,5 +12,14 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Hello]]></title>
+    <link href="http://friparia.github.io/blog/2014/03/28/hello/"/>
+    <updated>2014-03-28T23:40:44+08:00</updated>
+    <id>http://friparia.github.io/blog/2014/03/28/hello</id>
+    <content type="html"><![CDATA[<h1>Hello World</h1>
+]]></content>
+  </entry>
   
 </feed>
