@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Skills | Friparia Blog]]></title>
-  <link href="http://friparia.github.io/blog/categories/skills/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Coding-tools | Friparia Blog]]></title>
+  <link href="http://friparia.github.io/blog/categories/coding-tools/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-04-01T14:22:13+08:00</updated>
+  <updated>2014-04-01T14:41:25+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
