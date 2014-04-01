@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Friparia Blog]]></title>
-  <link href="http://friparia.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Skills | Friparia Blog]]></title>
+  <link href="http://friparia.github.io/blog/categories/skills/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
   <updated>2014-04-01T14:01:47+08:00</updated>
   <id>http://friparia.github.io/</id>
