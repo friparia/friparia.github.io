@@ -4,7 +4,7 @@ title: Blog Archive
 footer: false
 ---
 
-<div id="blog-archives">
+<div class="col-md-9 col-sm-9">
 {% for post in site.posts reverse %}
 {% capture this_year %}{{ post.date | date: "%Y" }}{% endcapture %}
 {% unless year == this_year %}

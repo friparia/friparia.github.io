@@ -3,9 +3,11 @@ layout: post
 title: "vim总结"
 date: 2014-03-31 13:54:35 +0800
 comments: true
-categories: 
+categories: coding-tools
+tags: vim
 ---
 这两天在看vim，顺手总结了下不知道但是觉得很有用命令
+<!--more-->
 
 * `U` 行撤销，撤销所有在最近编辑的行上的操作
 * `ZZ` 保存并退出
@@ -25,7 +27,6 @@ categories:
 ####寄存器
 * `“fyas` 拷贝一个句子到f寄存器
 
-####
 [我的vimrc](https://github.com/friparia/myscripts/blob/master/.vimrc)
 
 ####待整理

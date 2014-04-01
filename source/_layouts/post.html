@@ -3,15 +3,22 @@ layout: default
 single: true
 ---
 
-<div>
+<div class="col-md-9 blog-item margin-bottom-40">
 <article class="hentry" role="article">
   {% include article.html %}
+
   <footer>
-    <p class="meta">
+    <ul class="blog-info">
+      <li><i class="fa fa-user"></i>
       {% include post/author.html %}
+      </li>
+      <li><i class="fa fa-calendar"></i>
       {% include post/date.html %}{% if updated %}{{ updated }}{% else %}{{ time }}{% endif %}
-      {% include post/categories.html %}
-    </p>
+      </li>
+      <li><i class="fa fa-tags"></i>
+      {% if page.tags %}{% include post/tags.html %}{% endif %}
+      </li>
+    </ul>
     {% unless page.sharing == false %}
       {% include post/sharing.html %}
     {% endunless %}
@@ -33,11 +40,13 @@ single: true
 {% endif %}
 </div>
 {% unless page.sidebar == false %}
-<aside class="sidebar">
+<div class="col-md-3 col-sm-3 blog-sidebar">
   {% if site.post_asides.size %}
     {% include_array post_asides %}
   {% else %}
     {% include_array default_asides %}
   {% endif %}
-</aside>
+</div>
 {% endunless %}
+
+

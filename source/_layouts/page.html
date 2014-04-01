@@ -2,7 +2,7 @@
 layout: default
 ---
 
-<div>
+<div class="col-md-9 blog-item margin-bottom-40">
 <article role="article">
   {% if page.title %}
   <header>
@@ -32,11 +32,11 @@ layout: default
 {% endif %}
 </div>
 {% unless page.sidebar == false %}
-<aside class="sidebar">
+<div class="col-md-3 col-sm-3 blog-sidebar">
   {% if site.page_asides.size %}
     {% include_array page_asides %}
   {% else %}
     {% include_array default_asides %}
   {% endif %}
-</aside>
+</div>
 {% endunless %}
