@@ -107,6 +107,9 @@
 <div><p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
 看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
 
+<!--more-->
+
+
 <h1>准备</h1>
 
 <p>当然你得先有使用Laravel框架开发的基础了，然后就是插件的需要，Laravel是个很棒的框架，非常适合迅速快捷的开发，在不是特别庞大的系统面前我觉得非常容易而且好用，当然比较庞大的系统还没有做过，所以同样也是不了解。其次就是需要开发包的需求，有了包可以使我们的开发更加的快速，尤其是封装良好的Packages。而Laravel框架本身也提供了非常友好的包开发机制，使开发者们开发以及使用包都非常的容易，几个命令，一个包和自带的内容就非常容易的部署完成了。</p>
@@ -219,14 +222,16 @@ vendor是自己的厂商名或者组织或者个人的名字，package就是具�
 
 <h1>测试</h1>
 
-<p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示
-&#8220;`php
-Route::get(&lsquo;hello&rsquo;, function(){</p>
+<p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示</p>
 
-<pre><code>echo Package::hello();
-</code></pre>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nx">Route</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="nx">Package</span><span class="o">::</span><span class="na">hello</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>});</p>
 
 <h1>完成</h1>
 

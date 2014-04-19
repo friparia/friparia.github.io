@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: framework,php,packages | Friparia Blog]]></title>
   <link href="http://friparia.github.io/tags/framework-php-packages/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-04-18T23:41:32+08:00</updated>
+  <updated>2014-04-19T08:48:57+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -20,6 +20,9 @@
     <id>http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough</id>
     <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
 看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
+
+<!--more-->
+
 
 <h1>准备</h1>
 
@@ -116,7 +119,8 @@ Route::get(&lsquo;hello&rsquo;, function(){</p>
 <pre><code>echo Package::hello();
 </code></pre>
 
-<p>});</p>
+<p>});
+```</p>
 
 <h1>完成</h1>
 
