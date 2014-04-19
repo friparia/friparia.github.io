@@ -8,6 +8,7 @@ tags: framework,php,packages
 ---
 最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
 看的比较不错的是这个[Laravel Workbench Walkthrough](https://github.com/orangehill/Laravel-Workbench-Walkthrough)，这个介绍有一部分是从这上面看到的
+<!--more-->
 #准备
 当然你得先有使用Laravel框架开发的基础了，然后就是插件的需要，Laravel是个很棒的框架，非常适合迅速快捷的开发，在不是特别庞大的系统面前我觉得非常容易而且好用，当然比较庞大的系统还没有做过，所以同样也是不了解。其次就是需要开发包的需求，有了包可以使我们的开发更加的快速，尤其是封装良好的Packages。而Laravel框架本身也提供了非常友好的包开发机制，使开发者们开发以及使用包都非常的容易，几个命令，一个包和自带的内容就非常容易的部署完成了。
 #创建
@@ -77,5 +78,6 @@ $this->app->booting(function(){
 Route::get('hello', function(){
     echo Package::hello();
 });
+```
 #完成
 Ok,一个包就这样创建并使用了，通过包的开发方式，我们可以更容易的去复用自己的代码，减少自己的工作量。当然这才是包开发的基础，我会在下次写有关包命令开发的攻略~
