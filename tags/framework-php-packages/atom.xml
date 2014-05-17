@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: framework,php,packages | Friparia Blog]]></title>
   <link href="http://friparia.github.io/tags/framework-php-packages/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-04-21T11:07:10+08:00</updated>
+  <updated>2014-05-18T00:01:01+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Laravel 插件开发攻略]]></title>
+    <title type="html"><![CDATA[Laravel 插件开发入门]]></title>
     <link href="http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
     <updated>2014-04-18T22:38:49+08:00</updated>
     <id>http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough</id>
