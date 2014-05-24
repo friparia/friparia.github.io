@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Php | Friparia Blog]]></title>
   <link href="http://friparia.github.io/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-24T16:31:00+08:00</updated>
+  <updated>2014-05-24T17:08:34+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -19,14 +19,16 @@
     <updated>2014-04-18T22:38:49+08:00</updated>
     <id>http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough</id>
     <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
-看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的
-&lt;!--more--&gt;</p>
+看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
 
-<h1 id="toc_7">准备</h1>
+<!--more-->
+
+
+<h1>准备</h1>
 
 <p>当然你得先有使用Laravel框架开发的基础了，然后就是插件的需要，Laravel是个很棒的框架，非常适合迅速快捷的开发，在不是特别庞大的系统面前我觉得非常容易而且好用，当然比较庞大的系统还没有做过，所以同样也是不了解。其次就是需要开发包的需求，有了包可以使我们的开发更加的快速，尤其是封装良好的Packages。而Laravel框架本身也提供了非常友好的包开发机制，使开发者们开发以及使用包都非常的容易，几个命令，一个包和自带的内容就非常容易的部署完成了。</p>
 
-<h1 id="toc_8">创建</h1>
+<h1>创建</h1>
 
 <p>作为一个包，首先就是需要作者的信息了，所以我们先打开
 <code>app/config/workbench.php</code>
@@ -36,43 +38,55 @@
 vendor是自己的厂商名或者组织或者个人的名字，package就是具体的一个包的名字，比如我就可以以<code>friparia/generator</code>来代表我生成一个叫做generator的包，这个包是friparia发布的。<code>--resources</code>这个参数是表示生成一系列资源文件夹，包括包内的controllers、migrations等等。详细内容可以到<a href="http://golaravel.com/docs/4.1/packages">文档</a>了解
 现在就可以看到<code>workbench/vendor/package</code>下面的文件结构和内容了，这表明我们已经创建好了自己的包，第一步完成了</p>
 
-<h1 id="toc_9">设置</h1>
+<h1>设置</h1>
 
 <p>既然我们创建好了自己的包，自然我们就希望很容易的去使用到自己所创建的这个包，下面来谈一谈如何设置
 打开<code>app/config/app.php</code>添加一个自己的Service Provider(服务提供)
-<code>php
-&#39;providers&#39; =&gt; array(
-    //---- Other providers
-    &#39;Vendor\Package\PackageServiceProvide&#39;,
-    ),
-</code>
+```php
+&lsquo;providers&rsquo; => array(</p>
+
+<pre><code>//---- Other providers
+'Vendor\Package\PackageServiceProvide',
+),
+</code></pre>
+
+<p><code>
 这一步会在框架启动的时候去执行你的ServiceProvider去取得你的包中的内容，这样我们相当于注册了自己的服务
 然后我们就可以开始编写自己包中的内容了，打开workbench/vendor/package/src/Vendor/Package/Package.php，进行自己逻辑的编写，如下所示
-<code>php
+</code>php
 &lt;?php namespace Vendor\Package;
 class Package {
-  public static function hello(){
-    return &quot;Hello World!&quot;;
-  }
+  public static function hello(){</p>
+
+<pre><code>return "Hello World!";
+</code></pre>
+
+<p>  }
 }
-</code>
+<code>
 然后将我们写好的类注册到IoC容器中，使得框架能够正确加载，打开workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php，在register()函数中添加以下内容
-<code>php
+</code>php
 public function register(){
-  $this-&gt;app[&#39;package&#39;] = $this-&gt;app-&gt;share(function($app){
-      return new Package
-  });
+  $this->app[&lsquo;package&rsquo;] = $this->app->share(function($app){</p>
+
+<pre><code>  return new Package
+</code></pre>
+
+<p>  });
 }
-</code>
+<code>
 然后我们就可以在任何地方使用我们创建的包了，比如一条路由
-<code>php
-Route::get(&#39;hello&#39;, function(){
-    echo \Vendor\Package\Package::hello();
-});
-</code>
+</code>php
+Route::get(&lsquo;hello&rsquo;, function(){</p>
+
+<pre><code>echo \Vendor\Package\Package::hello();
+</code></pre>
+
+<p>});
+```
 访问这条路由我们就可以看到Hello World!了！</p>
 
-<h1 id="toc_10">Facade生成</h1>
+<h1>Facade生成</h1>
 
 <p>觉得每次要输那么长一串再得到自己的包是不是感觉不爽，要是直接能<code>Package::hello()</code>多好，这时候我们就可以用到设计模式中的外观模式了，有关设计模式我想结合Laravel框架中的为例子再以后的blog中说，我觉得现在自己掌握的还不是特别好。下面就让我们进行Facade的创建
 在<code>workbench/vendor/package/src/Vendor/Package</code>文件夹下创建一个<code>Facades</code>的文件夹
@@ -81,28 +95,34 @@ Route::get(&#39;hello&#39;, function(){
 &lt;?php namespace Vendor\Package\Facades;
 use Illuminate\Support\Facades\Facade;
 class Package extends Facade{
-  protected static function getFacadeAccessor(){ return &#39;package&#39;;}
+  protected static function getFacadeAccessor(){ return 'package';}
 }
 </code>
 然后将写好的Facade注册到自己的包中，打开<code>workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php</code>，在register()函数中添加以下几行:
-<code>php
-$this-&gt;app-&gt;booting(function(){
-    $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-    $loader-&gt;alias(&#39;Package&#39;, &#39;Vendor\Package\Facades\Package&#39;);
-});
-</code>
-或者你也可以直接写在<code>app/config/app.php</code>的alias数组中，我觉得其实写在Service Provider中会更好一点</p>
+```php
+$this->app->booting(function(){</p>
 
-<h1 id="toc_11">测试</h1>
+<pre><code>$loader = \Illuminate\Foundation\AliasLoader::getInstance();
+$loader-&gt;alias('Package', 'Vendor\Package\Facades\Package');
+</code></pre>
+
+<p>});
+<code>``
+或者你也可以直接写在</code>app/config/app.php`的alias数组中，我觉得其实写在Service Provider中会更好一点</p>
+
+<h1>测试</h1>
 
 <p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示
-<code>php
-Route::get(&#39;hello&#39;, function(){
-    echo Package::hello();
-});
-</code></p>
+```php
+Route::get(&lsquo;hello&rsquo;, function(){</p>
 
-<h1 id="toc_12">完成</h1>
+<pre><code>echo Package::hello();
+</code></pre>
+
+<p>});
+```</p>
+
+<h1>完成</h1>
 
 <p>Ok,一个包就这样创建并使用了，通过包的开发方式，我们可以更容易的去复用自己的代码，减少自己的工作量。当然这才是包开发的基础，我会在下次写有关包命令开发的攻略~</p>
 ]]></content>
