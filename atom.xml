@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-24T14:53:22+08:00</updated>
+  <updated>2014-05-24T14:55:21+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -44,12 +44,12 @@
 
 <p>这一行，使得我们的包能够找到所对应的命令。
 在<code>YourCommand</code>这个类中我们可以看到这几个方法:
-&ndash; <code>__consruct()</code>，当然这个是默认的构造函数没什么可说的
-&ndash; <code>fire()</code>， 这个函数是在我们运行命令的时候所执行的函数，即我们需要实现的具体逻辑代码就是写在这个里面的
-&ndash; <code>getArguments()</code>和<code>getOptions()</code>是得到命令的参数和选项，如果有参数设置的需要，我们可以通过<code>$this-&gt;argument('name')</code>和<code>$this-&gt;option('name')</code>来获得我们所需要的参数。
+ &ndash; <code>__consruct()</code>，当然这个是默认的构造函数没什么可说的
+ &ndash; <code>fire()</code>， 这个函数是在我们运行命令的时候所执行的函数，即我们需要实现的具体逻辑代码就是写在这个里面的
+ &ndash; <code>getArguments()</code>和<code>getOptions()</code>是得到命令的参数和选项，如果有参数设置的需要，我们可以通过<code>$this-&gt;argument('name')</code>和<code>$this-&gt;option('name')</code>来获得我们所需要的参数。
 同时还有两个属性:
-&ndash; <code>$name</code>，是这个命令的名字，即在命令行中所敲的
-&ndash; <code>$description</code>，是这个命令的描述，会对这个命令进行一个简要的描述
+ &ndash; <code>$name</code>，是这个命令的名字，即在命令行中所敲的
+ &ndash; <code>$description</code>，是这个命令的描述，会对这个命令进行一个简要的描述
 了解了这些之后我们就可以完成我们的<code>fire()</code>函数了，我们可能用得到的输出函数<code>info</code>,<code>comment</code>,<code>question</code>,<code>error</code>等可以以一种简单的方式使用。
 比如我们在刚开始询问是否生成，就可以写下以下代码:</p>
 
