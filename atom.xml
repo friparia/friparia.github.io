@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-25T15:49:08+08:00</updated>
+  <updated>2014-05-25T16:53:20+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -29,9 +29,9 @@
 
 <h1>创建</h1>
 
-<p>我们可能有两种不同的命令行开发，一种是在应用中的，可以简单的理解为我们的代码都是写在<code>app/commands</code>这个目录下的，另一种是在开发的包中的，也可以理解为我们所写的命令行代码是在<code>workbench/vendor/package/src/commands</code>文件中的，区别我们稍后会提到。</p>
+<p>我们可能有两种不同的命令行开发，一种是在应用中的，可以简单的理解为我们的代码都是写在<code>app/commands</code>这个目录下的，另一种是在开发的包中的，也可以理解为我们所写的命令行代码是在<code>workbench/vendor/package/src/Vendor/Package/</code>文件中的，区别我们稍后会提到。</p>
 
-<p>运行<code>php artisan command:make YourCommand</code>就可以创建一个命令了，默认是创建在你的应用中，即<code>app/commands</code>这个目录中，而如果我们需要创建在自己开发的包中的命令的话，我们就需要加上<code>--path=workbench/vendor/package/src/commands</code>这个参数，这样我们创建的命令才可以随着包的发布而进行使用了。在Yii框架里面，gii是一个非常好用的功能，使得我们能够以最快的速度生产出批量的代码，所以我们仿照gii的模式来创造一个Laravel的code generator。我们以包的命令创建为基础，即带path参数的<code>command:make</code>命令。</p>
+<p>运行<code>php artisan command:make YourCommand</code>就可以创建一个命令了，默认是创建在你的应用中，即<code>app/commands</code>这个目录中，而如果我们需要创建在自己开发的包中的命令的话，我们就需要加上<code>--path=workbench/vendor/package/src/Vendor/Package</code>这个参数，这样我们创建的命令才可以随着包的发布而进行使用了。</p>
 
 <h1>实现</h1>
 
@@ -72,6 +72,166 @@
 <p>这样我们就能够写出我们的具体的命令了，下面我们以一个压缩assets的命令例子来详细叙述整个包命令开发的过程</p>
 
 <h1>例子</h1>
+
+<p>首先按照<a href="http://www.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough/">包生成</a>来生成一个assetcompress的包，然后执行<code>command:make</code>命令在包内生成一个compress css的命令，我们执行的是<code>php artisan command:make CompressCssCommand --path=workbench/friparia/assetcompresser/src/Friparia/Assetcompresser</code></p>
+
+<p>然后打开<code>workbench/vendor/package/src/commands/</code>文件夹中刚才生成的文件，按照上述加入namespace我们来设定我们这个命令和描述</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">protected</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">&#39;compress:css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="k">protected</span> <span class="nv">$description</span> <span class="o">=</span> <span class="s1">&#39;Compress your css files to save your network traffic. No parameter means compress all css files in public/css in one file and &quot;--file&quot; means compress specify file&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样当我们运行<code>php artisan</code>时我们就可以看到我们的命令以及说明了，然后完成<code>fire()</code>方法，我们先完成不加参数的方法(此时需要先将<code>getArguments()</code>和<code>getOptions()</code>两个方法注释掉)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">fire</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">confirm</span><span class="p">(</span><span class="s1">&#39;Compress all css files?[Yes/No]&#39;</span><span class="p">)){</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">line</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;compressing ...&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$cssdir</span> <span class="o">=</span> <span class="nx">public_path</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;/css&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$compressed_filename</span> <span class="o">=</span> <span class="nv">$cssdir</span><span class="o">.</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nb">time</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;_compressed.min.css&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$cssdir</span><span class="p">)){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nv">$dh</span> <span class="o">=</span> <span class="nb">opendir</span><span class="p">(</span><span class="nv">$cssdir</span><span class="p">)){</span>
+</span><span class='line'>                <span class="nv">$minified</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">while</span><span class="p">(</span><span class="nv">$file</span> <span class="o">=</span> <span class="nb">readdir</span><span class="p">(</span><span class="nv">$dh</span><span class="p">)){</span>
+</span><span class='line'>                    <span class="k">if</span><span class="p">(</span><span class="nv">$file</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span> <span class="o">&amp;&amp;</span> <span class="nv">$file</span> <span class="o">!=</span> <span class="s1">&#39;..&#39;</span><span class="p">){</span>
+</span><span class='line'>                        <span class="nv">$path_parts</span> <span class="o">=</span> <span class="nb">pathinfo</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>                        <span class="k">if</span><span class="p">(</span><span class="nv">$path_parts</span><span class="p">[</span><span class="s1">&#39;extension&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;css&#39;</span><span class="p">){</span>
+</span><span class='line'>                            <span class="nv">$minified</span> <span class="o">.=</span> <span class="nx">Assetcompresser</span><span class="o">::</span><span class="na">minifycss</span><span class="p">(</span><span class="nv">$cssdir</span><span class="o">.</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>                        <span class="p">}</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$compressed_filename</span><span class="p">,</span> <span class="nv">$minified</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">line</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;css has compressed! The file&#39;</span><span class="o">.</span><span class="nv">$compressed_filename</span><span class="o">.</span><span class="s1">&#39; generated&#39;</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="s1">&#39;Cannot open &#39;</span><span class="o">.</span><span class="nv">$cssdir</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nv">$cssdir</span><span class="o">.</span><span class="s2">&quot;does not exist&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们有使用到<code>Assetcompresser::minifycss()</code>来压缩css，即我们这个包的功能，所以我们创建<code>Assetcompresser.php</code>文件，完成所需功能:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Friparia\Assetcompresser</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">class</span> <span class="nc">Assetcompresser</span><span class="p">{</span>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * Minifies css files</span>
+</span><span class='line'><span class="sd">     * @param  string  $path  input css file</span>
+</span><span class='line'><span class="sd">     * @return string         compressed string</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">static</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">minifycss</span><span class="p">(</span><span class="nv">$path</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$path</span><span class="p">)){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nv">$contents</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$path</span><span class="p">)){</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nx">trim</span><span class="p">(</span><span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$search</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;/\/\*[\d\D]*?\*\/|</span><span class="se">\t</span><span class="s2">+/&quot;</span><span class="p">,</span> <span class="s2">&quot;/\s+/&quot;</span><span class="p">,</span> <span class="s2">&quot;/\}\s+/&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$replace</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$search</span><span class="p">,</span> <span class="nv">$replace</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$search</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">;\s/&quot;</span><span class="p">,</span> <span class="s2">&quot;/\s+\{\\s+/&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">:\s+</span><span class="se">\\</span><span class="s2">#/&quot;</span><span class="p">,</span> <span class="s2">&quot;/,\s+/i&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">:\s+</span><span class="se">\\</span><span class="s2">\&#39;/i&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">:\s+([0-9]+|[A-F]+)/i&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$replace</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">,</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;:#&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:\&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;:$1&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$search</span><span class="p">,</span> <span class="nv">$replace</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="k">return</span> <span class="nv">$contents</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后别忘了在ServiceProvider里注册我们的命令，打开<code>AssetcompresserServiceProvider.php</code>，在<code>register()</code>方法中添加:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;command.compress.css&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">CompressCssCommand</span><span class="p">(</span><span class="nv">$app</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">commands</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;command.compress.css&#39;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以使得我们的命令能够正确的被执行，执行<code>php artisan compress:css</code>就可以得到我们压缩后的css文件。</p>
+
+<p>到此我们的不加参数的命令行的命令开发就完成了，在下一篇博客中我会把加参数的命令开发完成。并且利用空闲时间把这整个包完成~</p>
 ]]></content>
   </entry>
   
