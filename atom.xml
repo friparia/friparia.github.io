@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-25T16:55:49+08:00</updated>
+  <updated>2014-05-25T16:59:34+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -177,7 +177,9 @@
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
 <span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">class</span> <span class="nc">Assetcompresser</span><span class="p">{</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Friparia\Assetcompresser</span><span class="p">;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Assetcompresser</span><span class="p">{</span>
 </span><span class='line'>    <span class="sd">/**</span>
 </span><span class='line'><span class="sd">     * Minifies css files</span>
 </span><span class='line'><span class="sd">     * @param  string  $path  input css file</span>
