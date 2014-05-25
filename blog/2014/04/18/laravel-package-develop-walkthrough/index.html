@@ -243,6 +243,10 @@ vendor是自己的厂商名或者组织或者个人的名字，package就是具�
 </span></code></pre></td></tr></table></div></figure>
 
 
+<h1>Tips</h1>
+
+<p>如果出现<code>Class Not Found</code>的错误，注释掉<code>app/config/app.php</code>中自行添加的一行，并且在项目目录下执行<code>php artisan dump-autoload</code>命令即可，别忘了再将刚才注释的那行给取消注释了。</p>
+
 <h1>完成</h1>
 
 <p>Ok,一个包就这样创建并使用了，通过包的开发方式，我们可以更容易的去复用自己的代码，减少自己的工作量。当然这才是包开发的基础，我会在下次写有关包命令开发的攻略~</p>

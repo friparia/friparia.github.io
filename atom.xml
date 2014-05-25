@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-25T15:24:09+08:00</updated>
+  <updated>2014-05-25T15:49:08+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -208,6 +208,10 @@ vendor是自己的厂商名或者组织或者个人的名字，package就是具�
 </span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
+
+<h1>Tips</h1>
+
+<p>如果出现<code>Class Not Found</code>的错误，注释掉<code>app/config/app.php</code>中自行添加的一行，并且在项目目录下执行<code>php artisan dump-autoload</code>命令即可，别忘了再将刚才注释的那行给取消注释了。</p>
 
 <h1>完成</h1>
 
