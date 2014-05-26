@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-26T15:35:04+08:00</updated>
+  <updated>2014-05-26T15:36:15+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -149,7 +149,7 @@
 
 <p>我们有使用到<code>Assetcompresser::minifycss()</code>来压缩css，即我们这个包的功能，所以我们创建<code>Assetcompresser.php</code>文件，完成所需功能:</p>
 
-<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Assetcompresser.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
