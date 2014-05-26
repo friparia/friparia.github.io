@@ -100,7 +100,7 @@ samp {
 }
 
 pre {
-  white-space: pre-wrap;
+  white-space: pre;
 }
 
 q {
@@ -770,7 +770,7 @@ pre code {
   padding: 0;
   font-size: inherit;
   color: inherit;
-  white-space: pre-wrap;
+  white-space: pre;
   background-color: transparent;
   border-radius: 0;
 }
