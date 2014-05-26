@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-25T17:03:36+08:00</updated>
+  <updated>2014-05-26T13:35:01+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -18,10 +18,8 @@
     <link href="http://friparia.github.io/blog/2014/05/17/laravel-command-line-walkthrough/"/>
     <updated>2014-05-17T23:08:46+08:00</updated>
     <id>http://friparia.github.io/blog/2014/05/17/laravel-command-line-walkthrough</id>
-    <content type="html"><![CDATA[<p>上一篇我们试过了Laravel中的包开发，我们可以创建自己的包，并且复用他们，来很快的构建我们的应用，这一次我们来简要介绍一下Laravel中另一个强大的功能，Artisan命令行，当然，文档是一切的基础<a href="http://www.golaravel.com/docs/4.1/commands/">中文文档</a>，这个可能稍微有点过时，如生成使得<code>--bench</code>的参数在新版本中就已经去掉了，所以看<a href="https://www.laravel.com/">英文文档</a>是一个不错的选择</p>
-
-<!--more-->
-
+    <content type="html"><![CDATA[<p>上一篇我们试过了Laravel中的包开发，我们可以创建自己的包，并且复用他们，来很快的构建我们的应用，这一次我们来简要介绍一下Laravel中另一个强大的功能，Artisan命令行，当然，文档是一切的基础<a href="http://www.golaravel.com/docs/4.1/commands/">中文文档</a>，这个可能稍微有点过时，如生成使得<code>--bench</code>的参数在新版本中就已经去掉了，所以看<a href="https://www.laravel.com/">英文文档</a>是一个不错的选择<br>
+&lt;!&#8211;more&#8211;&gt;</p>
 
 <h1>准备</h1>
 
@@ -35,13 +33,11 @@
 
 <h1>实现</h1>
 
-<p>用命令行就可以搭一个很不错的架子出来，我们可以打开生成的<code>workbench/vendor/package/src/commands/YourCommand.php</code>这个文件，来完成我们具体的命令实现。
-由于<code>--bench</code>参数不再支持，所以我们手动在开始加入</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">namespace</span> <span class="nx">Vendor\Package</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<p>用命令行就可以搭一个很不错的架子出来，我们可以打开生成的<code>workbench/vendor/package/src/commands/YourCommand.php</code>这个文件，来完成我们具体的命令实现。<br>
+由于<code>--bench</code>参数不再支持，所以我们手动在开始加入<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">namespace</span> <span class="nx">Vendor\Package</span><span class="p">;</span><br>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>这一行，使得我们的包能够找到所对应的命令。</p>
 
@@ -50,14 +46,13 @@
 <ul>
 <li><code>__consruct()</code>，当然这个是默认的构造函数没什么可说的</li>
 <li><code>fire()</code>， 这个函数是在我们运行命令的时候所执行的函数，即我们需要实现的具体逻辑代码就是写在这个里面的</li>
-<li><code>getArguments()</code>和<code>getOptions()</code>是得到命令的参数和选项，如果有参数设置的需要，我们可以通过<code>$this-&gt;argument('name')</code>和<code>$this-&gt;option('name')</code>来获得我们所需要的参数。
+<li><code>getArguments()</code>和<code>getOptions()</code>是得到命令的参数和选项，如果有参数设置的需要，我们可以通过<code>$this-&gt;argument(&#39;name&#39;)</code>和<code>$this-&gt;option(&#39;name&#39;)</code>来获得我们所需要的参数。
 同时还有两个属性:</li>
 <li><code>$name</code>，是这个命令的名字，即在命令行中所敲的</li>
 <li><code>$description</code>，是这个命令的描述，会对这个命令进行一个简要的描述</li>
 </ul>
 
-
-<p>了解了这些之后我们就可以完成我们的<code>fire()</code>函数了，我们可能用得到的输出函数<code>info</code>,<code>comment</code>,<code>question</code>,<code>error</code>等可以以一种简单的方式使用。
+<p>了解了这些之后我们就可以完成我们的<code>fire()</code>函数了，我们可能用得到的输出函数<code>info</code>,<code>comment</code>,<code>question</code>,<code>error</code>等可以以一种简单的方式使用。<br>
 比如我们在刚开始询问是否生成，就可以写下以下代码:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -68,21 +63,18 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
 <p>这样我们就能够写出我们的具体的命令了，下面我们以一个压缩assets的命令例子来详细叙述整个包命令开发的过程</p>
 
 <h1>例子</h1>
 
 <p>首先按照<a href="http://www.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough/">包生成</a>来生成一个assetcompress的包，然后执行<code>command:make</code>命令在包内生成一个compress css的命令，我们执行的是<code>php artisan command:make CompressCssCommand --path=workbench/friparia/assetcompresser/src/Friparia/Assetcompresser</code></p>
 
-<p>然后打开<code>workbench/vendor/package/src/commands/</code>文件夹中刚才生成的文件，按照上述加入namespace我们来设定我们这个命令和描述</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">protected</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">&#39;compress:css&#39;</span><span class="p">;</span>
-</span><span class='line'><span class="k">protected</span> <span class="nv">$description</span> <span class="o">=</span> <span class="s1">&#39;Compress your css files to save your network traffic. No parameter means compress all css files in public/css in one file and &quot;--file&quot; means compress specify file&#39;</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<p>然后打开<code>workbench/vendor/package/src/commands/</code>文件夹中刚才生成的文件，按照上述加入namespace我们来设定我们这个命令和描述<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">protected</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">&#39;compress:css&#39;</span><span class="p">;</span><br>
+</span><span class='line'><span class="k">protected</span> <span class="nv">$description</span> <span class="o">=</span> <span class="s1">&#39;Compress your css files to save your network traffic. No parameter means compress all css files in public/css in one file and &quot;--file&quot; means compress specify file&#39;</span><span class="p">;</span><br>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>这样当我们运行<code>php artisan</code>时我们就可以看到我们的命令以及说明了，然后完成<code>fire()</code>方法，我们先完成不加参数的方法(此时需要先将<code>getArguments()</code>和<code>getOptions()</code>两个方法注释掉)</p>
 
@@ -146,7 +138,6 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
 <p>我们有使用到<code>Assetcompresser::minifycss()</code>来压缩css，即我们这个包的功能，所以我们创建<code>Assetcompresser.php</code>文件，完成所需功能:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -209,25 +200,21 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>最后别忘了在ServiceProvider里注册我们的命令，打开<code>AssetcompresserServiceProvider.php</code>，在<code>register()</code>方法中添加:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;command.compress.css&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">CompressCssCommand</span><span class="p">(</span><span class="nv">$app</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">commands</span><span class="p">(</span>
-</span><span class='line'>        <span class="s1">&#39;command.compress.css&#39;</span>
-</span><span class='line'>    <span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>以使得我们的命令能够正确的被执行，执行<code>php artisan compress:css</code>就可以得到我们压缩后的css文件。</p>
+<p>最后别忘了在ServiceProvider里注册我们的命令，打开<code>AssetcompresserServiceProvider.php</code>，在<code>register()</code>方法中添加:<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+<span class='line-number'>5</span><br>
+<span class='line-number'>6</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;command.compress.css&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span><br>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">CompressCssCommand</span><span class="p">(</span><span class="nv">$app</span><span class="p">);</span><br>
+</span><span class='line'>    <span class="p">});</span><br>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">commands</span><span class="p">(</span><br>
+</span><span class='line'>        <span class="s1">&#39;command.compress.css&#39;</span><br>
+</span><span class='line'>    <span class="p">);</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+以使得我们的命令能够正确的被执行，执行<code>php artisan compress:css</code>就可以得到我们压缩后的css文件。</p>
 
 <p>到此我们的不加参数的命令行的命令开发就完成了，在下一篇博客中我会把加参数的命令开发完成。并且利用空闲时间把这整个包完成~</p>
 ]]></content>
@@ -238,11 +225,9 @@
     <link href="http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
     <updated>2014-04-18T22:38:49+08:00</updated>
     <id>http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough</id>
-    <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
-看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
-
-<!--more-->
-
+    <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……<br>
+看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的<br>
+&lt;!&#8211;more&#8211;&gt;</p>
 
 <h1>准备</h1>
 
@@ -250,122 +235,102 @@
 
 <h1>创建</h1>
 
-<p>作为一个包，首先就是需要作者的信息了，所以我们先打开
-<code>app/config/workbench.php</code>
-进行自己的名字和Email的配置，这些信息会在下面我们执行生成命令的时候自动写入到<code>composer.json</code>的文件中。
-填写完自己的信息后我们就可以使用命令来自动生成一些文件，在根目录下执行下面的命令:
-<code>php artisan workbench vendor/package --resources</code>
-vendor是自己的厂商名或者组织或者个人的名字，package就是具体的一个包的名字，比如我就可以以<code>friparia/generator</code>来代表我生成一个叫做generator的包，这个包是friparia发布的。<code>--resources</code>这个参数是表示生成一系列资源文件夹，包括包内的controllers、migrations等等。详细内容可以到<a href="http://golaravel.com/docs/4.1/packages">文档</a>了解
+<p>作为一个包，首先就是需要作者的信息了，所以我们先打开<br>
+<code>app/config/workbench.php</code><br>
+进行自己的名字和Email的配置，这些信息会在下面我们执行生成命令的时候自动写入到<code>composer.json</code>的文件中。<br>
+填写完自己的信息后我们就可以使用命令来自动生成一些文件，在根目录下执行下面的命令:<br>
+<code>php artisan workbench vendor/package --resources</code><br>
+vendor是自己的厂商名或者组织或者个人的名字，package就是具体的一个包的名字，比如我就可以以<code>friparia/generator</code>来代表我生成一个叫做generator的包，这个包是friparia发布的。<code>--resources</code>这个参数是表示生成一系列资源文件夹，包括包内的controllers、migrations等等。详细内容可以到<a href="http://golaravel.com/docs/4.1/packages">文档</a>了解<br>
 现在就可以看到<code>workbench/vendor/package</code>下面的文件结构和内容了，这表明我们已经创建好了自己的包，第一步完成了</p>
 
 <h1>设置</h1>
 
-<p>既然我们创建好了自己的包，自然我们就希望很容易的去使用到自己所创建的这个包，下面来谈一谈如何设置
-打开<code>app/config/app.php</code>添加一个自己的Service Provider(服务提供)</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="s1">&#39;providers&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
-</span><span class='line'>    <span class="c1">//---- Other providers</span>
-</span><span class='line'>    <span class="s1">&#39;Vendor\Package\PackageServiceProvide&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="p">),</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>这一步会在框架启动的时候去执行你的ServiceProvider去取得你的包中的内容，这样我们相当于注册了自己的服务
-然后我们就可以开始编写自己包中的内容了，打开workbench/vendor/package/src/Vendor/Package/Package.php，进行自己逻辑的编写，如下所示</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Vendor\Package</span><span class="p">;</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">Package</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">hello</span><span class="p">(){</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s2">&quot;Hello World!&quot;</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后将我们写好的类注册到IoC容器中，使得框架能够正确加载，打开workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php，在register()函数中添加以下内容</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">(){</span>
-</span><span class='line'>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span>
-</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="nx">Package</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后我们就可以在任何地方使用我们创建的包了，比如一条路由</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nx">Route</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
-</span><span class='line'>    <span class="k">echo</span> <span class="nx">\Vendor\Package\Package</span><span class="o">::</span><span class="na">hello</span><span class="p">();</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>访问这条路由我们就可以看到Hello World!了！</p>
+<p>既然我们创建好了自己的包，自然我们就希望很容易的去使用到自己所创建的这个包，下面来谈一谈如何设置<br>
+打开<code>app/config/app.php</code>添加一个自己的Service Provider(服务提供)<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="s1">&#39;providers&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><br>
+</span><span class='line'>    <span class="c1">//---- Other providers</span><br>
+</span><span class='line'>    <span class="s1">&#39;Vendor\Package\PackageServiceProvide&#39;</span><span class="p">,</span><br>
+</span><span class='line'>    <span class="p">),</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+这一步会在框架启动的时候去执行你的ServiceProvider去取得你的包中的内容，这样我们相当于注册了自己的服务<br>
+然后我们就可以开始编写自己包中的内容了，打开workbench/vendor/package/src/Vendor/Package/Package.php，进行自己逻辑的编写，如下所示<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+<span class='line-number'>5</span><br>
+<span class='line-number'>6</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Vendor\Package</span><span class="p">;</span><br>
+</span><span class='line'><span class="k">class</span> <span class="nc">Package</span> <span class="p">{</span><br>
+</span><span class='line'>  <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">hello</span><span class="p">(){</span><br>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">&quot;Hello World!&quot;</span><span class="p">;</span><br>
+</span><span class='line'>  <span class="p">}</span><br>
+</span><span class='line'><span class="p">}</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+然后将我们写好的类注册到IoC容器中，使得框架能够正确加载，打开workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php，在register()函数中添加以下内容<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+<span class='line-number'>5</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">(){</span><br>
+</span><span class='line'>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span><br>
+</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="nx">Package</span><br>
+</span><span class='line'>  <span class="p">});</span><br>
+</span><span class='line'><span class="p">}</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+然后我们就可以在任何地方使用我们创建的包了，比如一条路由<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nx">Route</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span><br>
+</span><span class='line'>    <span class="k">echo</span> <span class="nx">\Vendor\Package\Package</span><span class="o">::</span><span class="na">hello</span><span class="p">();</span><br>
+</span><span class='line'><span class="p">});</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+访问这条路由我们就可以看到Hello World!了！</p>
 
 <h1>Facade生成</h1>
 
-<p>觉得每次要输那么长一串再得到自己的包是不是感觉不爽，要是直接能<code>Package::hello()</code>多好，这时候我们就可以用到设计模式中的外观模式了，有关设计模式我想结合Laravel框架中的为例子再以后的blog中说，我觉得现在自己掌握的还不是特别好。下面就让我们进行Facade的创建
-在<code>workbench/vendor/package/src/Vendor/Package</code>文件夹下创建一个<code>Facades</code>的文件夹
-在这个<code>Facades</code>的文件夹中我们创建一个叫做<code>Package.php</code>的文件，这个文件的具体内容如下</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Vendor\Package\Facades</span><span class="p">;</span>
-</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Facade</span><span class="p">;</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">Package</span> <span class="k">extends</span> <span class="nx">Facade</span><span class="p">{</span>
-</span><span class='line'>  <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getFacadeAccessor</span><span class="p">(){</span> <span class="k">return</span> <span class="s1">&#39;package&#39;</span><span class="p">;}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>然后将写好的Facade注册到自己的包中，打开<code>workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php</code>，在register()函数中添加以下几行:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">booting</span><span class="p">(</span><span class="k">function</span><span class="p">(){</span>
-</span><span class='line'>    <span class="nv">$loader</span> <span class="o">=</span> <span class="nx">\Illuminate\Foundation\AliasLoader</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
-</span><span class='line'>    <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">alias</span><span class="p">(</span><span class="s1">&#39;Package&#39;</span><span class="p">,</span> <span class="s1">&#39;Vendor\Package\Facades\Package&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>或者你也可以直接写在<code>app/config/app.php</code>的alias数组中，我觉得其实写在Service Provider中会更好一点</p>
+<p>觉得每次要输那么长一串再得到自己的包是不是感觉不爽，要是直接能<code>Package::hello()</code>多好，这时候我们就可以用到设计模式中的外观模式了，有关设计模式我想结合Laravel框架中的为例子再以后的blog中说，我觉得现在自己掌握的还不是特别好。下面就让我们进行Facade的创建<br>
+在<code>workbench/vendor/package/src/Vendor/Package</code>文件夹下创建一个<code>Facades</code>的文件夹<br>
+在这个<code>Facades</code>的文件夹中我们创建一个叫做<code>Package.php</code>的文件，这个文件的具体内容如下<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+<span class='line-number'>5</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Vendor\Package\Facades</span><span class="p">;</span><br>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Facade</span><span class="p">;</span><br>
+</span><span class='line'><span class="k">class</span> <span class="nc">Package</span> <span class="k">extends</span> <span class="nx">Facade</span><span class="p">{</span><br>
+</span><span class='line'>  <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getFacadeAccessor</span><span class="p">(){</span> <span class="k">return</span> <span class="s1">&#39;package&#39;</span><span class="p">;}</span><br>
+</span><span class='line'><span class="p">}</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+然后将写好的Facade注册到自己的包中，打开<code>workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php</code>，在register()函数中添加以下几行:<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+<span class='line-number'>4</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">booting</span><span class="p">(</span><span class="k">function</span><span class="p">(){</span><br>
+</span><span class='line'>    <span class="nv">$loader</span> <span class="o">=</span> <span class="nx">\Illuminate\Foundation\AliasLoader</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span><br>
+</span><span class='line'>    <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">alias</span><span class="p">(</span><span class="s1">&#39;Package&#39;</span><span class="p">,</span> <span class="s1">&#39;Vendor\Package\Facades\Package&#39;</span><span class="p">);</span><br>
+</span><span class='line'><span class="p">});</span><br>
+</span></code></pre></td></tr></table></div></figure><br>
+或者你也可以直接写在<code>app/config/app.php</code>的alias数组中，我觉得其实写在Service Provider中会更好一点</p>
 
 <h1>测试</h1>
 
-<p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nx">Route</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
-</span><span class='line'>    <span class="k">echo</span> <span class="nx">Package</span><span class="o">::</span><span class="na">hello</span><span class="p">();</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示<br>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br>
+<span class='line-number'>2</span><br>
+<span class='line-number'>3</span><br>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nx">Route</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span><br>
+</span><span class='line'>    <span class="k">echo</span> <span class="nx">Package</span><span class="o">::</span><span class="na">hello</span><span class="p">();</span><br>
+</span><span class='line'><span class="p">});</span><br>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h1>Tips</h1>
 
@@ -382,10 +347,8 @@ vendor是自己的厂商名或者组织或者个人的名字，package就是具�
     <link href="http://friparia.github.io/blog/2014/03/31/vimzong-jie/"/>
     <updated>2014-03-31T13:54:35+08:00</updated>
     <id>http://friparia.github.io/blog/2014/03/31/vimzong-jie</id>
-    <content type="html"><![CDATA[<p>这两天在看vim，顺手总结了下不知道但是觉得很有用命令</p>
-
-<!--more-->
-
+    <content type="html"><![CDATA[<p>这两天在看vim，顺手总结了下不知道但是觉得很有用命令<br>
+&lt;!&#8211;more&#8211;&gt;</p>
 
 <ul>
 <li><code>U</code> 行撤销，撤销所有在最近编辑的行上的操作</li>
@@ -397,17 +360,15 @@ vendor是自己的厂商名或者组织或者个人的名字，package就是具�
 <li><code>F</code> 向左查找</li>
 <li><code>t</code> 查找至其前一个字符</li>
 <li><code>ctrl-v</code> 启动矩形可视模式</li>
-<li><code>`”</code> 跳转到上次离开这个文件时的位置</li>
-<li><code>`.</code> 最后一次修文件的位置</li>
+<li>`<code>”</code> 跳转到上次离开这个文件时的位置</li>
+<li>`<code>.</code> 最后一次修文件的位置</li>
 <li><code>.</code> 重复前一个修改命令</li>
 <li><code>ctrl-l</code> 重画整个屏幕</li>
 <li><code>gf</code> 查找文件中文件名，然后打开(必须在path中或者超链接)</li>
 <li><code>gv</code> 选择上次选过的文本
-
-<h4>寄存器</h4></li>
+####寄存器</li>
 <li><code>“fyas</code> 拷贝一个句子到f寄存器</li>
 </ul>
-
 
 <p><a href="https://github.com/friparia/myscripts/blob/master/.vimrc">我的vimrc</a></p>
 
@@ -417,7 +378,6 @@ vendor是自己的厂商名或者组织或者个人的名字，package就是具�
 <li>单词组成部分’iskeyword’</li>
 <li>文本组成对象 text-objects</li>
 </ul>
-
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Tag: framework,php,packages | Friparia Blog]]></title>
   <link href="http://friparia.github.io/tags/framework-php-packages/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-25T17:03:36+08:00</updated>
+  <updated>2014-05-26T13:35:01+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -18,11 +18,9 @@
     <link href="http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
     <updated>2014-04-18T22:38:49+08:00</updated>
     <id>http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough</id>
-    <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
-看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
-
-<!--more-->
-
+    <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……<br>
+看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的<br>
+&lt;!--more--&gt;</p>
 
 <h1>准备</h1>
 
@@ -30,97 +28,79 @@
 
 <h1>创建</h1>
 
-<p>作为一个包，首先就是需要作者的信息了，所以我们先打开
-<code>app/config/workbench.php</code>
-进行自己的名字和Email的配置，这些信息会在下面我们执行生成命令的时候自动写入到<code>composer.json</code>的文件中。
-填写完自己的信息后我们就可以使用命令来自动生成一些文件，在根目录下执行下面的命令:
-<code>php artisan workbench vendor/package --resources</code>
-vendor是自己的厂商名或者组织或者个人的名字，package就是具体的一个包的名字，比如我就可以以<code>friparia/generator</code>来代表我生成一个叫做generator的包，这个包是friparia发布的。<code>--resources</code>这个参数是表示生成一系列资源文件夹，包括包内的controllers、migrations等等。详细内容可以到<a href="http://golaravel.com/docs/4.1/packages">文档</a>了解
+<p>作为一个包，首先就是需要作者的信息了，所以我们先打开<br>
+<code>app/config/workbench.php</code><br>
+进行自己的名字和Email的配置，这些信息会在下面我们执行生成命令的时候自动写入到<code>composer.json</code>的文件中。<br>
+填写完自己的信息后我们就可以使用命令来自动生成一些文件，在根目录下执行下面的命令:<br>
+<code>php artisan workbench vendor/package --resources</code><br>
+vendor是自己的厂商名或者组织或者个人的名字，package就是具体的一个包的名字，比如我就可以以<code>friparia/generator</code>来代表我生成一个叫做generator的包，这个包是friparia发布的。<code>--resources</code>这个参数是表示生成一系列资源文件夹，包括包内的controllers、migrations等等。详细内容可以到<a href="http://golaravel.com/docs/4.1/packages">文档</a>了解<br>
 现在就可以看到<code>workbench/vendor/package</code>下面的文件结构和内容了，这表明我们已经创建好了自己的包，第一步完成了</p>
 
 <h1>设置</h1>
 
-<p>既然我们创建好了自己的包，自然我们就希望很容易的去使用到自己所创建的这个包，下面来谈一谈如何设置
-打开<code>app/config/app.php</code>添加一个自己的Service Provider(服务提供)
-```php
-&lsquo;providers&rsquo; => array(</p>
-
-<pre><code>//---- Other providers
-'Vendor\Package\PackageServiceProvide',
-),
-</code></pre>
-
-<p><code>
-这一步会在框架启动的时候去执行你的ServiceProvider去取得你的包中的内容，这样我们相当于注册了自己的服务
-然后我们就可以开始编写自己包中的内容了，打开workbench/vendor/package/src/Vendor/Package/Package.php，进行自己逻辑的编写，如下所示
-</code>php
-&lt;?php namespace Vendor\Package;
-class Package {
-  public static function hello(){</p>
-
-<pre><code>return "Hello World!";
-</code></pre>
-
-<p>  }
-}
-<code>
-然后将我们写好的类注册到IoC容器中，使得框架能够正确加载，打开workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php，在register()函数中添加以下内容
-</code>php
-public function register(){
-  $this->app[&lsquo;package&rsquo;] = $this->app->share(function($app){</p>
-
-<pre><code>  return new Package
-</code></pre>
-
-<p>  });
-}
-<code>
-然后我们就可以在任何地方使用我们创建的包了，比如一条路由
-</code>php
-Route::get(&lsquo;hello&rsquo;, function(){</p>
-
-<pre><code>echo \Vendor\Package\Package::hello();
-</code></pre>
-
-<p>});
-```
+<p>既然我们创建好了自己的包，自然我们就希望很容易的去使用到自己所创建的这个包，下面来谈一谈如何设置<br>
+打开<code>app/config/app.php</code>添加一个自己的Service Provider(服务提供)<br>
+<code>php<br>
+&#39;providers&#39; =&gt; array(<br>
+    //---- Other providers<br>
+    &#39;Vendor\Package\PackageServiceProvide&#39;,<br>
+    ),<br>
+</code><br>
+这一步会在框架启动的时候去执行你的ServiceProvider去取得你的包中的内容，这样我们相当于注册了自己的服务<br>
+然后我们就可以开始编写自己包中的内容了，打开workbench/vendor/package/src/Vendor/Package/Package.php，进行自己逻辑的编写，如下所示<br>
+<code>php<br>
+&lt;?php namespace Vendor\Package;<br>
+class Package {<br>
+  public static function hello(){<br>
+    return &quot;Hello World!&quot;;<br>
+  }<br>
+}<br>
+</code><br>
+然后将我们写好的类注册到IoC容器中，使得框架能够正确加载，打开workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php，在register()函数中添加以下内容<br>
+<code>php<br>
+public function register(){<br>
+  $this-&gt;app[&#39;package&#39;] = $this-&gt;app-&gt;share(function($app){<br>
+      return new Package<br>
+  });<br>
+}<br>
+</code><br>
+然后我们就可以在任何地方使用我们创建的包了，比如一条路由<br>
+<code>php<br>
+Route::get(&#39;hello&#39;, function(){<br>
+    echo \Vendor\Package\Package::hello();<br>
+});<br>
+</code><br>
 访问这条路由我们就可以看到Hello World!了！</p>
 
 <h1>Facade生成</h1>
 
-<p>觉得每次要输那么长一串再得到自己的包是不是感觉不爽，要是直接能<code>Package::hello()</code>多好，这时候我们就可以用到设计模式中的外观模式了，有关设计模式我想结合Laravel框架中的为例子再以后的blog中说，我觉得现在自己掌握的还不是特别好。下面就让我们进行Facade的创建
-在<code>workbench/vendor/package/src/Vendor/Package</code>文件夹下创建一个<code>Facades</code>的文件夹
-在这个<code>Facades</code>的文件夹中我们创建一个叫做<code>Package.php</code>的文件，这个文件的具体内容如下
-<code>php
-&lt;?php namespace Vendor\Package\Facades;
-use Illuminate\Support\Facades\Facade;
-class Package extends Facade{
-  protected static function getFacadeAccessor(){ return 'package';}
-}
-</code>
-然后将写好的Facade注册到自己的包中，打开<code>workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php</code>，在register()函数中添加以下几行:
-```php
-$this->app->booting(function(){</p>
-
-<pre><code>$loader = \Illuminate\Foundation\AliasLoader::getInstance();
-$loader-&gt;alias('Package', 'Vendor\Package\Facades\Package');
-</code></pre>
-
-<p>});
-<code>``
-或者你也可以直接写在</code>app/config/app.php`的alias数组中，我觉得其实写在Service Provider中会更好一点</p>
+<p>觉得每次要输那么长一串再得到自己的包是不是感觉不爽，要是直接能<code>Package::hello()</code>多好，这时候我们就可以用到设计模式中的外观模式了，有关设计模式我想结合Laravel框架中的为例子再以后的blog中说，我觉得现在自己掌握的还不是特别好。下面就让我们进行Facade的创建<br>
+在<code>workbench/vendor/package/src/Vendor/Package</code>文件夹下创建一个<code>Facades</code>的文件夹<br>
+在这个<code>Facades</code>的文件夹中我们创建一个叫做<code>Package.php</code>的文件，这个文件的具体内容如下<br>
+<code>php<br>
+&lt;?php namespace Vendor\Package\Facades;<br>
+use Illuminate\Support\Facades\Facade;<br>
+class Package extends Facade{<br>
+  protected static function getFacadeAccessor(){ return &#39;package&#39;;}<br>
+}<br>
+</code><br>
+然后将写好的Facade注册到自己的包中，打开<code>workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php</code>，在register()函数中添加以下几行:<br>
+<code>php<br>
+$this-&gt;app-&gt;booting(function(){<br>
+    $loader = \Illuminate\Foundation\AliasLoader::getInstance();<br>
+    $loader-&gt;alias(&#39;Package&#39;, &#39;Vendor\Package\Facades\Package&#39;);<br>
+});<br>
+</code><br>
+或者你也可以直接写在<code>app/config/app.php</code>的alias数组中，我觉得其实写在Service Provider中会更好一点</p>
 
 <h1>测试</h1>
 
-<p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示
-```php
-Route::get(&lsquo;hello&rsquo;, function(){</p>
-
-<pre><code>echo Package::hello();
-</code></pre>
-
-<p>});
-```</p>
+<p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示<br>
+<code>php<br>
+Route::get(&#39;hello&#39;, function(){<br>
+    echo Package::hello();<br>
+});<br>
+</code></p>
 
 <h1>Tips</h1>
 
