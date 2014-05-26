@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-26T14:51:28+08:00</updated>
+  <updated>2014-05-26T14:53:18+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -77,7 +77,7 @@
 
 <p>然后打开<code>workbench/vendor/package/src/commands/</code>文件夹中刚才生成的文件，按照上述加入namespace我们来设定我们这个命令和描述</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">protected</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">&#39;compress:css&#39;</span><span class="p">;</span>
 </span><span class='line'><span class="k">protected</span> <span class="nv">$description</span> <span class="o">=</span> <span class="s1">&#39;Compress your css files to save your network traffic. No parameter means compress all css files in public/css in one file and &quot;--file&quot; means compress specify file&#39;</span><span class="p">;</span>
@@ -86,7 +86,7 @@
 
 <p>这样当我们运行<code>php artisan</code>时我们就可以看到我们的命令以及说明了，然后完成<code>fire()</code>方法，我们先完成不加参数的方法(此时需要先将<code>getArguments()</code>和<code>getOptions()</code>两个方法注释掉)</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -149,7 +149,7 @@
 
 <p>我们有使用到<code>Assetcompresser::minifycss()</code>来压缩css，即我们这个包的功能，所以我们创建<code>Assetcompresser.php</code>文件，完成所需功能:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -212,7 +212,7 @@
 
 <p>最后别忘了在ServiceProvider里注册我们的命令，打开<code>AssetcompresserServiceProvider.php</code>，在<code>register()</code>方法中添加:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>

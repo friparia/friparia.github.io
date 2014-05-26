@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Laravel,php | Friparia Blog]]></title>
   <link href="http://friparia.github.io/blog/categories/laravel-php/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-26T14:51:28+08:00</updated>
+  <updated>2014-05-26T14:53:18+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -71,14 +71,14 @@ if($this-&gt;confirm('确定生成?[Y|N]){
 <p>首先按照<a href="http://www.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough/">包生成</a>来生成一个assetcompress的包，然后执行<code>command:make</code>命令在包内生成一个compress css的命令，我们执行的是<code>php artisan command:make CompressCssCommand --path=workbench/friparia/assetcompresser/src/Friparia/Assetcompresser</code></p>
 
 <p>然后打开<code>workbench/vendor/package/src/commands/</code>文件夹中刚才生成的文件，按照上述加入namespace我们来设定我们这个命令和描述
-<code>php
+<code>php CompressCssCommand.php
 protected $name = 'compress:css';
 protected $description = 'Compress your css files to save your network traffic. No parameter means compress all css files in public/css in one file and "--file" means compress specify file';
 </code></p>
 
 <p>这样当我们运行<code>php artisan</code>时我们就可以看到我们的命令以及说明了，然后完成<code>fire()</code>方法，我们先完成不加参数的方法(此时需要先将<code>getArguments()</code>和<code>getOptions()</code>两个方法注释掉)</p>
 
-<p>```php</p>
+<p>```php CompressCssCommand.php</p>
 
 <pre><code>public function fire()
 {
@@ -115,7 +115,7 @@ protected $description = 'Compress your css files to save your network traffic. 
 
 <p>我们有使用到<code>Assetcompresser::minifycss()</code>来压缩css，即我们这个包的功能，所以我们创建<code>Assetcompresser.php</code>文件，完成所需功能:</p>
 
-<p>```php
+<p>```php CompressCssCommand.php
 &lt;?php namespace Friparia\Assetcompresser;
 class Assetcompresser{</p>
 
@@ -151,7 +151,7 @@ static public function minifycss($path){
 ```</p>
 
 <p>最后别忘了在ServiceProvider里注册我们的命令，打开<code>AssetcompresserServiceProvider.php</code>，在<code>register()</code>方法中添加:
-```php</p>
+```php CompressCssCommand.php</p>
 
 <pre><code>    $this-&gt;app['command.compress.css'] = $this-&gt;app-&gt;share(function($app){
         return new CompressCssCommand($app);
