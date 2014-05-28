@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Laravel 插件开发攻略"
+title: "Laravel 插件开发入门"
 date: 2014-04-18 22:38:49 +0800
 comments: true
 categories: php
@@ -79,5 +79,7 @@ Route::get('hello', function(){
     echo Package::hello();
 });
 ```
+#Tips
+如果出现`Class Not Found`的错误，注释掉`app/config/app.php`中自行添加的一行，并且在项目目录下执行`php artisan dump-autoload`命令即可，别忘了再将刚才注释的那行给取消注释了。
 #完成
 Ok,一个包就这样创建并使用了，通过包的开发方式，我们可以更容易的去复用自己的代码，减少自己的工作量。当然这才是包开发的基础，我会在下次写有关包命令开发的攻略~

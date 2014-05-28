@@ -1,0 +1,7 @@
+<div class="highlight"><pre>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;command.compress.css&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">CompressCssCommand</span><span class="p">(</span><span class="nv">$app</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">commands</span><span class="p">(</span>
+        <span class="s1">&#39;command.compress.css&#39;</span>
+    <span class="p">);</span>
+</pre></div>

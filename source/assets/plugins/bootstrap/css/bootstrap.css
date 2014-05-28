@@ -100,7 +100,7 @@ samp {
 }
 
 pre {
-  white-space: pre-wrap;
+  white-space: pre;
 }
 
 q {
@@ -759,7 +759,7 @@ pre {
   font-size: 13px;
   line-height: 1.428571429;
   color: #333333;
-  word-break: break-all;
+  /* word-break: break-all; */
   word-wrap: break-word;
   background-color: #f5f5f5;
   border: 1px solid #cccccc;
@@ -770,7 +770,7 @@ pre code {
   padding: 0;
   font-size: inherit;
   color: inherit;
-  white-space: pre-wrap;
+  white-space: pre;
   background-color: transparent;
   border-radius: 0;
 }
