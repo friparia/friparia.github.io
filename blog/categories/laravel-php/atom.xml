@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Laravel,php | Friparia Blog]]></title>
   <link href="http://friparia.github.io/blog/categories/laravel-php/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-05-30T14:22:38+08:00</updated>
+  <updated>2014-06-16T18:01:00+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -12,6 +12,103 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel 带参数的命令行开发]]></title>
+    <link href="http://friparia.github.io/blog/2014/06/16/laravel-command-with-option-chs/"/>
+    <updated>2014-06-16T17:27:33+08:00</updated>
+    <id>http://friparia.github.io/blog/2014/06/16/laravel-command-with-option-chs</id>
+    <content type="html"><![CDATA[<p>上一次我们简要介绍了Laravel中命令行的不带参数或者选项的开发，今天我们要完善我们上一次的压缩css的工作，使得我们可以压缩我们指定的css文件，如以下命令所示</p>
+
+<!--more-->
+
+
+<p><code>php artisan compress:css --file=public/css/example.css</code>或者<code>php artisan compress:css -f public/css/example.css</code></p>
+
+<p>这就我们需要来了解上一次被我们注释掉的<code>getArguments()</code>和<code>getOptions()</code>方法，这两个方法是由Laravel提供的，为了自定义自己的参数或者选项而设置的。</p>
+
+<h1>getArguments</h1>
+
+<p>这个函数返回一个数组，数组中的元素定义为
+<code>php
+array($name, $mode, $description, $defaultValue)
+</code>
+<code>$name</code>是参数的名字，<code>$mode</code>是其模式，这个函数有这两个值:
+ &ndash; <code>InputArgument::REQUIRED</code>，表示这个参数是必须的，如果在使用命令的时候没有输入，则会报错
+ &ndash; <code>InputArgument::OPTIONAL</code>，这个则表示是可选的，在使用命令时可以不用。
+<code>$description</code>是这个参数的描述，在<code>--hlep</code>时会显示其描述，<code>$defaultValue</code>顾名思义即为这个参数的默认值</p>
+
+<h1>getOptions</h1>
+
+<p>要想实现开头所说的效果，于是我们就着重使用getOptions这个函数，同样和<code>getArguments</code>返回相同的数组，不过数组中的元素不一样
+<code>php
+array($name, $shortcut, $mode, $description, $defaultValue)
+</code>
+多了一个<code>$shortcut</code>选项，在我们的例子中我们可以将其设置成为<code>-f</code>，而其模式<code>$mode</code>也有不同，如下所示:
+ &ndash; <code>InputOption::VALUE_REQUIRED</code>，表明这个参数是必须的
+ &ndash; <code>InputOption::VALUE_OPTIONAL</code>，表明这个参数是可选的
+ &ndash; <code>InputOption::VALUE_IS_ARRAY</code> ，表明这个参数是一个数组，使用命令时呈现这种形式<code>--option=value1 --option=value2</code>
+ &ndash; <code>InputOption::VALUE_NONE</code>，表明只是一个开关而没有具体参数，如同我们在编译安装时的<code>--with-xxx</code></p>
+
+<p>了解了我们的函数后我们就可以完成我们的方法了:
+```php CompressCssCommand.php</p>
+
+<pre><code>/**
+ * Get the console command options.
+ *
+ * @return array
+ */
+protected function getOptions()
+{
+    return array(
+        array('file', '-f', InputOption::VALUE_OPTIONAL, 'Compress an input css file', null),
+    );
+}
+</code></pre>
+
+<p>```</p>
+
+<p>完成这两个函数后我们可以通过这样的方法得到我们的选项或者参数值
+<code>
+$this-&gt;argument('file'); //获取$name为"file"的参数的值
+$this-&gt;argument(); //获得所有参数的数组
+$this-&gt;option('file'); //获取$name为"file"的选项的值
+$this-&gt;option(); //获得所有选项的数组
+</code></p>
+
+<p>然后我们完成最后的逻辑，修改我们的<code>fire()</code>函数为:
+```php CompressCssCommand.php</p>
+
+<pre><code>public function fire()
+{
+    $inputfile = $this-&gt;option('file');
+    if(is_null($inputfile) &amp;&amp; $this-&gt;confirm('Compress all css files?[Yes/No]')){
+      // 上一次我们书写的代码
+    }else if($this-&gt;confirm('Compress this '.$inputfile.' css files?[Yes/No]')){
+        $this-&gt;info('compressing ...');
+        $file = $inputfile;
+        $cssdir = public_path().'/css';
+        $compressed_filename = $cssdir.'/'.time().'_compressed.min.css';
+        $path_parts = pathinfo($file);
+        if($path_parts['extension'] == 'css'){
+            $minified = Assetcompresser::minifycss(base_path().'/'.$file);
+        }
+        file_put_contents($compressed_filename, $minified);
+        $this-&gt;line('');
+        $this-&gt;info('css has compressed! The file'.$compressed_filename.' generated');
+    }
+}
+</code></pre>
+
+<p>```</p>
+
+<h1>总结</h1>
+
+<p>这个asset压缩的包我会上传到我的github和packagist上去，并且将其功能完善得更好，欢迎大家拍砖……</p>
+
+<p>这样我们的Laravel的命令行攻略也算介绍完了，个人觉得主要是因为文档中没有一个确定的例子来带着做有可能在第一次使用到的时候遇到麻烦，所以写了这几篇，也算是练练手，非常感谢<a href="http://weibo.com/http://weibo.com/byrwdjwxh">@耗子飞飞飞_BYR</a>给予的指导~接下来可能会准备深入了解一下Laravel的框架，然后在更深的层面上写一点东西。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Laravel 命令行开发入门]]></title>
