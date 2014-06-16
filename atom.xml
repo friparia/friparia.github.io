@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-06-16T18:03:08+08:00</updated>
+  <updated>2014-06-16T18:08:05+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -27,7 +27,7 @@
 
 <p>这就我们需要来了解上一次被我们注释掉的<code>getArguments()</code>和<code>getOptions()</code>方法，这两个方法是由Laravel提供的，为了自定义自己的参数或者选项而设置的。</p>
 
-<h1>getArguments</h1>
+<h2>getArguments</h2>
 
 <p>这个函数返回一个数组，数组中的元素定义为</p>
 
@@ -36,12 +36,16 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><code>$name</code>是参数的名字，<code>$mode</code>是其模式，这个函数有这两个值:
- &ndash; <code>InputArgument::REQUIRED</code>，表示这个参数是必须的，如果在使用命令的时候没有输入，则会报错
- &ndash; <code>InputArgument::OPTIONAL</code>，这个则表示是可选的，在使用命令时可以不用。
-<code>$description</code>是这个参数的描述，在<code>--hlep</code>时会显示其描述，<code>$defaultValue</code>顾名思义即为这个参数的默认值</p>
+<p><code>$name</code>是参数的名字，<code>$mode</code>是其模式，这个函数有这两个值:</p>
 
-<h1>getOptions</h1>
+<ul>
+<li><code>InputArgument::REQUIRED</code>，表示这个参数是必须的，如果在使用命令的时候没有输入，则会报错</li>
+<li><code>InputArgument::OPTIONAL</code>，这个则表示是可选的，在使用命令时可以不用。
+<code>$description</code>是这个参数的描述，在<code>--hlep</code>时会显示其描述，<code>$defaultValue</code>顾名思义即为这个参数的默认值</li>
+</ul>
+
+
+<h2>getOptions</h2>
 
 <p>要想实现开头所说的效果，于是我们就着重使用getOptions这个函数，同样和<code>getArguments</code>返回相同的数组，不过数组中的元素不一样</p>
 
@@ -50,11 +54,15 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>多了一个<code>$shortcut</code>选项，在我们的例子中我们可以将其设置成为<code>-f</code>，而其模式<code>$mode</code>也有不同，如下所示:
- &ndash; <code>InputOption::VALUE_REQUIRED</code>，表明这个参数是必须的
- &ndash; <code>InputOption::VALUE_OPTIONAL</code>，表明这个参数是可选的
- &ndash; <code>InputOption::VALUE_IS_ARRAY</code> ，表明这个参数是一个数组，使用命令时呈现这种形式<code>--option=value1 --option=value2</code>
- &ndash; <code>InputOption::VALUE_NONE</code>，表明只是一个开关而没有具体参数，如同我们在编译安装时的<code>--with-xxx</code></p>
+<p>多了一个<code>$shortcut</code>选项，在我们的例子中我们可以将其设置成为<code>-f</code>，而其模式<code>$mode</code>也有不同，如下所示:</p>
+
+<ul>
+<li><code>InputOption::VALUE_REQUIRED</code>，表明这个参数是必须的</li>
+<li><code>InputOption::VALUE_OPTIONAL</code>，表明这个参数是可选的</li>
+<li><code>InputOption::VALUE_IS_ARRAY</code> ，表明这个参数是一个数组，使用命令时呈现这种形式<code>--option=value1 --option=value2</code></li>
+<li><code>InputOption::VALUE_NONE</code>，表明只是一个开关而没有具体参数，如同我们在编译安装时的<code>--with-xxx</code></li>
+</ul>
+
 
 <p>了解了我们的函数后我们就可以完成我们的方法了:</p>
 
