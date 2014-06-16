@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-06-16T18:01:00+08:00</updated>
+  <updated>2014-06-16T18:03:08+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -143,7 +143,7 @@
 
 <p>这个asset压缩的包我会上传到我的github和packagist上去，并且将其功能完善得更好，欢迎大家拍砖……</p>
 
-<p>这样我们的Laravel的命令行攻略也算介绍完了，个人觉得主要是因为文档中没有一个确定的例子来带着做有可能在第一次使用到的时候遇到麻烦，所以写了这几篇，也算是练练手，非常感谢<a href="http://weibo.com/http://weibo.com/byrwdjwxh">@耗子飞飞飞_BYR</a>给予的指导~接下来可能会准备深入了解一下Laravel的框架，然后在更深的层面上写一点东西。</p>
+<p>这样我们的Laravel的命令行攻略也算介绍完了，个人觉得主要是因为文档中没有一个确定的例子来带着做有可能在第一次使用到的时候遇到麻烦，所以写了这几篇，也算是练练手，非常感谢<a href="http://weibo.com/byrwdjwxh">@耗子飞飞飞_BYR</a>给予的指导~接下来可能会准备深入了解一下Laravel的框架，然后在更深的层面上写一点东西。</p>
 ]]></content>
   </entry>
   
