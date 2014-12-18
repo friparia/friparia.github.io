@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://friparia.github.io/atom.xml" rel="self"/>
   <link href="http://friparia.github.io/"/>
-  <updated>2014-08-25T21:24:17+08:00</updated>
+  <updated>2014-12-18T14:56:13+08:00</updated>
   <id>http://friparia.github.io/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -12,6 +12,440 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[你真的了解javascript么?(上)]]></title>
+    <link href="http://friparia.github.io/blog/2014/11/30/do-you-really-know-javascript/"/>
+    <updated>2014-11-30T12:17:44+08:00</updated>
+    <id>http://friparia.github.io/blog/2014/11/30/do-you-really-know-javascript</id>
+    <content type="html"><![CDATA[<p>原文<a href="http://javascript-puzzlers.herokuapp.com/">JavaScript Puzzlers!</a>，对自己的Javascript有信心的可以尝试去完成这个测试。</p>
+
+<p>Javascript这门语言一直受到争议，因为其灵活性以及各大浏览器的实现不同导致其有很多的陷阱，这些陷阱非常容易掉进去。我们以<a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.19">EMAC 262(5.1)</a>标准为例来总结一些Javascript中意想不到的陷阱。当然，因为浏览器、REPL等实现方式不一样，以下的结果可能不一样。</p>
+
+<!--more-->
+
+
+<ol>
+<li><p><code>["1", "2", "3"].map(parseInt)</code> 的执行结果是什么?</p>
+
+<p> 答案是[1, NaN, NaN]， 原因是 parseInt 接受两个参数 (val, radix) 而 map 传递三个参数 (element, index, array)</p></li>
+<li><p><code>[typeof null, null instanceof Object]</code> 的执行结果是什么?</p>
+
+<p> 答案是[&ldquo;object&rdquo;, false]，多么不可思议，明明null的type是object，而null却又不是Object的一个实例，是因为typeof在对不可调用的对象操作时总是会返回&#8221;object&#8221;</p></li>
+<li><p><code>[ [3,2,1].reduce(Math.pow), [].reduce(Math.pow) ]</code> 的执行结果是什么?</p>
+
+<p> 会报错，因为对一个没有初始化的空数组进行操作的reduce方法会抛出TypeError</p></li>
+<li><p>以下程序段的执行结果是什么</p></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="kd">var</span> <span class="nx">val</span> <span class="o">=</span> <span class="s1">&#39;smtg&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Value is &#39;</span> <span class="o">+</span> <span class="p">(</span><span class="nx">val</span> <span class="o">===</span> <span class="s1">&#39;smtg&#39;</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;Something&#39;</span> <span class="o">:</span> <span class="s1">&#39;Nothing&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  这个非常有迷惑性，但是&#8217;+&lsquo;的优先级最高，所以结果是&#8221;Something&#8221;，我们来拆开看一下，先执行&#8217;Value is &rsquo; + (val == &lsquo;smtg&rsquo;), 然后才是 &lsquo;Value is true&rsquo; ? &lsquo;Something&rsquo; : &lsquo;Nothing&rsquo;</p>
+
+<ol>
+<li>以下程序段的执行结果是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;World!&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">name</span> <span class="o">===</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Jack&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Goodbye &#39;</span> <span class="o">+</span> <span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Hello &#39;</span> <span class="o">+</span> <span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">})();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  这个算是比较常见的，我相信你看完这个之后对这个就没有任何问题了，<a href="http://bonsaiden.github.io/JavaScript-Garden/zh/#function.scopes">作用域与命名空间</a>。其实质是变量声明提升(Hoisting)，Javascript将会把var表达式和function声明提升到当前作用域的顶部，更多有关<a href="http://code.tutsplus.com/tutorials/quick-tip-javascript-hoisting-explained--net-15092">hoisting</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">name</span><span class="p">;</span> <span class="c1">// 默认值‘undefined&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">name</span><span class="p">;</span> <span class="c1">// 默认值‘undefined&#39;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">name</span> <span class="o">===</span> <span class="s1">&#39;undefined&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Jack&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Goodbye &#39;</span> <span class="o">+</span> <span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Hello &#39;</span> <span class="o">+</span> <span class="nx">name</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">})();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">name</span> <span class="o">=</span> <span class="s2">&quot;World&quot;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ol>
+<li>以下程序段的执行结果是什么?</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">END</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">53</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">START</span> <span class="o">=</span> <span class="nx">END</span> <span class="o">-</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">START</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">END</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">count</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">count</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  这是一个无限循环，2<sup>53</sup>是javascript中的最大的数，并且2<sup>53</sup>+1 = 2<sup>53</sup>，所以永远不会结束。</p>
+
+<ol>
+<li>以下程序段的执行结果是什么?</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">ary</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">];</span>
+</span><span class='line'><span class="nx">ary</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span><span class='line'><span class="nx">ary</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span> <span class="o">===</span> <span class="kc">undefined</span><span class="p">;});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  答案是[],因为Array.prototype.filter不对不存在的元素执行</p>
+
+<ol>
+<li>以下程序段的执行结果是什么?</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">two</span>   <span class="o">=</span> <span class="mf">0.2</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">one</span>   <span class="o">=</span> <span class="mf">0.1</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">eight</span> <span class="o">=</span> <span class="mf">0.8</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">six</span>   <span class="o">=</span> <span class="mf">0.6</span>
+</span><span class='line'><span class="p">[</span><span class="nx">two</span> <span class="o">-</span> <span class="nx">one</span> <span class="o">==</span> <span class="nx">one</span><span class="p">,</span> <span class="nx">eight</span> <span class="o">-</span> <span class="nx">six</span> <span class="o">==</span> <span class="nx">two</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  答案是[true, false]</p>
+
+<ol>
+<li>以下程序段的执行结果是什么?</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">showCase</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">switch</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="s1">&#39;A&#39;</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Case A&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="s1">&#39;B&#39;</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Case B&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="kc">undefined</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;undefined&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Do not know!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">showCase</span><span class="p">(</span><span class="k">new</span> <span class="nb">String</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  答案是Do not know，因为switch内部使用的是===, <code>new String</code>创建一个Object</p>
+
+<ol>
+<li>以下程序段的结果是什么?</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">showCase2</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">switch</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="s1">&#39;A&#39;</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Case A&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="s1">&#39;B&#39;</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Case B&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">case</span> <span class="kc">undefined</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;undefined&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Do not know!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">showCase2</span><span class="p">(</span><span class="nb">String</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  有了上一问，这一问就好答多了，因为String(&lsquo;A&rsquo;)返回一个字符串而不是一个字符串对象，所以是Case A</p>
+
+<ol>
+<li>以下程序段的输出是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">isOdd</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">num</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">isEven</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">num</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">isSane</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">isEven</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="o">||</span> <span class="nx">isOdd</span><span class="p">(</span><span class="nx">num</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;13&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="kc">Infinity</span><span class="p">];</span>
+</span><span class='line'><span class="nx">values</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">isSane</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  答案[true, true, true, false, false]，因为 Infinity % 2是NaN， -9 % 2 是 -1</p>
+
+<ol>
+<li>以下程序的输出是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">parseInt</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</span><span class='line'><span class="nb">parseInt</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'><span class="nb">parseInt</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  答案是3,NaN,3, 前两个很显然，但是0呢，parseInt认为他是虚假的radix，会假设你给的是10</p>
+
+<ol>
+<li><code>Array.isArray( Array.prototype )</code> 的输出是什么</li>
+</ol>
+
+
+<p>  true, Array.prototype是Array，不是Object</p>
+
+<ol>
+<li>下面程序段的输出是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span><span class='line'><span class="k">if</span> <span class="p">([</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span> <span class="o">==</span> <span class="kc">true</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;wut&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  false, [0]作为布尔值的时候是true，但是当他在做比较的时候[0]用另一种方式做转换，所以是false。是不是有一种想掀桌的想法。</p>
+
+<ol>
+<li><code>[]==[]</code> 的结果是什么</li>
+</ol>
+
+
+<p>  false, 因为这是两个不同的实例对象，所以false，这样就正确了 typeof [] ==  typeof [].</p>
+
+<ol>
+<li>下面的程序输出是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s1">&#39;5&#39;</span> <span class="o">+</span> <span class="mi">3</span>
+</span><span class='line'><span class="s1">&#39;5&#39;</span> <span class="o">-</span> <span class="mi">3</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  &ldquo;53&rdquo;,2，当+左边是字符串是，执行字符串连接。-号将左边转换成了数字。</p>
+
+<ol>
+<li><p><code>1 + - + + + - + 1</code>执行结果是什么</p>
+
+<p>答案是2。很有趣，当你执行没有空格的语句时，结果为error。//TODO</p></li>
+<li><p>下面程序段的执行结果是什么</p></li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">ary</span> <span class="o">=</span> <span class="nb">Array</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+</span><span class='line'><span class="nx">ary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="mi">2</span>
+</span><span class='line'><span class="nx">ary</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">elem</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="s1">&#39;1&#39;</span><span class="p">;</span> <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  [&ldquo;1&rdquo;, undefined, undefined]，因为map只对初始化的数组元素有效果。</p>
+
+<ol>
+<li>下面的程序段的结果是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">sidEffecting</span><span class="p">(</span><span class="nx">ary</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">ary</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ary</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">bar</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">,</span><span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">c</span> <span class="o">=</span> <span class="mi">10</span>
+</span><span class='line'>  <span class="nx">sidEffecting</span><span class="p">(</span><span class="nx">arguments</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span> <span class="o">+</span> <span class="nx">c</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="nx">bar</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  答案是21，arguments这是一个特别变量，是传递给这个函数的参数列表。所以c变为10，a也在执行sidEffection时变成了10，结果变为21。这个也可以从这里找到答案<a href="http://bonsaiden.github.io/JavaScript-Garden/zh/#function.arguments">arguments</a></p>
+
+<ol>
+<li>下面表达式的结果是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">111111111111111110000</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">b</span> <span class="o">=</span> <span class="mi">1111</span><span class="p">;</span>
+</span><span class='line'><span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  同第六个。</p>
+
+<ol>
+<li>下面程序段的结果是什么</li>
+</ol>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="p">[].</span><span class="nx">reverse</span><span class="p">;</span>
+</span><span class='line'><span class="nx">x</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  是window，[].reverse会返回this指针，当没有明确的接收对象时，会被默认为window</p>
+
+<ol>
+<li><code>Number.MIN_VALUE &gt; 0</code> 正确吗？</li>
+</ol>
+
+
+<p>  正确，因为Number.MIN_VALUE是大于0的最小的数， -Number.MAX_VALUE是最小的数。</p>
+
+<ol>
+<li><code>[1 &lt; 2 &lt; 3, 3 &lt; 2 &lt; 1]</code>的结果是什么</li>
+</ol>
+
+
+<p>  [true, true] 执行顺序为(1 &lt; 2) &lt; 3 和 (3 &lt; 2) &lt; 1， 即 true &lt; 3, false &lt; 1，即true, true</p>
+
+<ol>
+<li><code>2 == [[[2]]]</code>结果是什么</li>
+</ol>
+
+
+<p>  [[2]]转换成为了对象，在比较的时候两边都转换成为了字符串&#8221;2&#8221;</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[你在浏览器里面输入网址后都发生了什么]]></title>
@@ -73,8 +507,8 @@
 <p>有任何问题可以通过以下方式联系我:</p>
 
 <ul>
-<li><p>邮箱:<a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#x66;&#x72;&#x69;&#112;&#x61;&#114;&#105;&#97;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;">&#102;&#x72;&#105;&#112;&#97;&#x72;&#105;&#97;&#x40;&#103;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;</a></p></li>
-<li><p>irc:<a href="&#x6d;&#97;&#x69;&#108;&#x74;&#111;&#58;&#x66;&#114;&#x69;&#112;&#97;&#114;&#105;&#x61;&#x40;&#x69;&#114;&#99;&#x2e;&#102;&#114;&#x65;&#x65;&#110;&#111;&#x64;&#101;&#x2e;&#x6e;&#x65;&#x74;">&#102;&#114;&#x69;&#x70;&#97;&#x72;&#x69;&#97;&#x40;&#x69;&#x72;&#x63;&#46;&#102;&#114;&#x65;&#101;&#x6e;&#111;&#x64;&#x65;&#46;&#110;&#x65;&#116;</a></p></li>
+<li><p>邮箱:<a href="&#109;&#x61;&#x69;&#x6c;&#116;&#x6f;&#58;&#102;&#114;&#x69;&#112;&#97;&#114;&#x69;&#x61;&#x40;&#103;&#109;&#x61;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#x66;&#114;&#x69;&#112;&#x61;&#114;&#105;&#97;&#x40;&#x67;&#109;&#97;&#105;&#108;&#46;&#x63;&#111;&#x6d;</a></p></li>
+<li><p>irc:<a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#58;&#102;&#114;&#105;&#112;&#97;&#x72;&#x69;&#97;&#64;&#x69;&#x72;&#99;&#x2e;&#x66;&#x72;&#x65;&#x65;&#x6e;&#x6f;&#x64;&#101;&#46;&#x6e;&#x65;&#116;">&#x66;&#x72;&#105;&#x70;&#x61;&#114;&#x69;&#x61;&#64;&#x69;&#x72;&#x63;&#46;&#x66;&#x72;&#101;&#101;&#x6e;&#x6f;&#x64;&#101;&#46;&#110;&#101;&#x74;</a></p></li>
 </ul>
 
 ]]></content>

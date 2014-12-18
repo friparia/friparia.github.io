@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Tag: web, | Friparia Blog]]></title>
+  <link href="http://friparia.github.io/tags/web/atom.xml" rel="self"/>
+  <link href="http://friparia.github.io/"/>
+  <updated>2014-12-18T14:56:13+08:00</updated>
+  <id>http://friparia.github.io/</id>
+  <author>
+    <name><![CDATA[Friparia]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[你真的了解javascript么?(上)]]></title>
+    <link href="http://friparia.github.io/blog/2014/11/30/do-you-really-know-javascript/"/>
+    <updated>2014-11-30T12:17:44+08:00</updated>
+    <id>http://friparia.github.io/blog/2014/11/30/do-you-really-know-javascript</id>
+    <content type="html"><![CDATA[<p>原文<a href="http://javascript-puzzlers.herokuapp.com/">JavaScript Puzzlers!</a>，对自己的Javascript有信心的可以尝试去完成这个测试。</p>
+
+<p>Javascript这门语言一直受到争议，因为其灵活性以及各大浏览器的实现不同导致其有很多的陷阱，这些陷阱非常容易掉进去。我们以<a href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.4.4.19">EMAC 262(5.1)</a>标准为例来总结一些Javascript中意想不到的陷阱。当然，因为浏览器、REPL等实现方式不一样，以下的结果可能不一样。</p>
+
+<!--more-->
+
+
+<ol>
+<li><p><code>["1", "2", "3"].map(parseInt)</code> 的执行结果是什么?</p>
+
+<p> 答案是[1, NaN, NaN]， 原因是 parseInt 接受两个参数 (val, radix) 而 map 传递三个参数 (element, index, array)</p></li>
+<li><p><code>[typeof null, null instanceof Object]</code> 的执行结果是什么?</p>
+
+<p> 答案是[&ldquo;object&rdquo;, false]，多么不可思议，明明null的type是object，而null却又不是Object的一个实例，是因为typeof在对不可调用的对象操作时总是会返回"object"</p></li>
+<li><p><code>[ [3,2,1].reduce(Math.pow), [].reduce(Math.pow) ]</code> 的执行结果是什么?</p>
+
+<p> 会报错，因为对一个没有初始化的空数组进行操作的reduce方法会抛出TypeError</p></li>
+<li><p>以下程序段的执行结果是什么
+<code>javascript
+var val = 'smtg';
+console.log('Value is ' + (val === 'smtg') ? 'Something' : 'Nothing');
+</code></p></li>
+</ol>
+
+
+<p>  这个非常有迷惑性，但是'+&lsquo;的优先级最高，所以结果是"Something"，我们来拆开看一下，先执行'Value is &rsquo; + (val == &lsquo;smtg&rsquo;), 然后才是 &lsquo;Value is true&rsquo; ? &lsquo;Something&rsquo; : &lsquo;Nothing&rsquo;</p>
+
+<ol>
+<li>以下程序段的执行结果是什么
+<code>javascript
+var name = 'World!';
+(function () {
+if (typeof name === 'undefined') {
+ var name = 'Jack';
+ console.log('Goodbye ' + name);
+} else {
+ console.log('Hello ' + name);
+}
+})();
+</code></li>
+</ol>
+
+
+<p>  这个算是比较常见的，我相信你看完这个之后对这个就没有任何问题了，<a href="http://bonsaiden.github.io/JavaScript-Garden/zh/#function.scopes">作用域与命名空间</a>。其实质是变量声明提升(Hoisting)，Javascript将会把var表达式和function声明提升到当前作用域的顶部，更多有关<a href="http://code.tutsplus.com/tutorials/quick-tip-javascript-hoisting-explained--net-15092">hoisting</a>
+```javascript
+var name; // 默认值‘undefined'</p>
+
+<p>(function () {
+  var name; // 默认值‘undefined'
+  if (typeof name === &lsquo;undefined&rsquo;) {</p>
+
+<pre><code>name = 'Jack';
+console.log('Goodbye ' + name);
+</code></pre>
+
+<p>  } else {</p>
+
+<pre><code>console.log('Hello ' + name);
+</code></pre>
+
+<p>  }
+})();</p>
+
+<p>name = &ldquo;World&rdquo;;
+```</p>
+
+<ol>
+<li>以下程序段的执行结果是什么?
+<code>javascript
+var END = Math.pow(2, 53);
+var START = END - 100;
+var count = 0;
+for (var i = START; i &lt;= END; i++) {
+count++;
+}
+console.log(count);
+</code></li>
+</ol>
+
+
+<p>  这是一个无限循环，2<sup>53</sup>是javascript中的最大的数，并且2<sup>53</sup>+1 = 2<sup>53</sup>，所以永远不会结束。</p>
+
+<ol>
+<li>以下程序段的执行结果是什么?
+<code>javascript
+var ary = [0,1,2];
+ary[10] = 10;
+ary.filter(function(x) { return x === undefined;});
+</code></li>
+</ol>
+
+
+<p>  答案是[],因为Array.prototype.filter不对不存在的元素执行</p>
+
+<ol>
+<li>以下程序段的执行结果是什么?
+<code>javascript
+var two   = 0.2
+var one   = 0.1
+var eight = 0.8
+var six   = 0.6
+[two - one == one, eight - six == two]
+</code></li>
+</ol>
+
+
+<p>  答案是[true, false]</p>
+
+<ol>
+<li>以下程序段的执行结果是什么?
+<code>javascript
+function showCase(value) {
+switch(value) {
+ case 'A':
+   console.log('Case A');
+   break;
+ case 'B':
+   console.log('Case B');
+   break;
+ case undefined:
+   console.log('undefined');
+   break;
+ default:
+   console.log('Do not know!');
+}
+}
+showCase(new String('A'));
+</code></li>
+</ol>
+
+
+<p>  答案是Do not know，因为switch内部使用的是===, <code>new String</code>创建一个Object</p>
+
+<ol>
+<li>以下程序段的结果是什么?
+<code>javascript
+function showCase2(value) {
+switch(value) {
+case 'A':
+  console.log('Case A');
+  break;
+case 'B':
+  console.log('Case B');
+  break;
+case undefined:
+  console.log('undefined');
+  break;
+default:
+  console.log('Do not know!');
+}
+}
+showCase2(String('A'));
+</code></li>
+</ol>
+
+
+<p>  有了上一问，这一问就好答多了，因为String(&lsquo;A&rsquo;)返回一个字符串而不是一个字符串对象，所以是Case A</p>
+
+<ol>
+<li>以下程序段的输出是什么
+<code>javascript
+function isOdd(num) {
+return num % 2 == 1;
+}
+function isEven(num) {
+return num % 2 == 0;
+}
+function isSane(num) {
+return isEven(num) || isOdd(num);
+}
+var values = [7, 4, '13', -9, Infinity];
+values.map(isSane);
+</code></li>
+</ol>
+
+
+<p>  答案[true, true, true, false, false]，因为 Infinity % 2是NaN， -9 % 2 是 -1</p>
+
+<ol>
+<li>以下程序的输出是什么
+<code>javascript
+parseInt(3, 8)
+parseInt(3, 2)
+parseInt(3, 0)
+</code></li>
+</ol>
+
+
+<p>  答案是3,NaN,3, 前两个很显然，但是0呢，parseInt认为他是虚假的radix，会假设你给的是10</p>
+
+<ol>
+<li><code>Array.isArray( Array.prototype )</code> 的输出是什么</li>
+</ol>
+
+
+<p>  true, Array.prototype是Array，不是Object</p>
+
+<ol>
+<li>下面程序段的输出是什么
+<code>javascript
+var a = [0];
+if ([0]) {
+console.log(a == true);
+} else {
+console.log("wut");
+}
+</code></li>
+</ol>
+
+
+<p>  false, [0]作为布尔值的时候是true，但是当他在做比较的时候[0]用另一种方式做转换，所以是false。是不是有一种想掀桌的想法。</p>
+
+<ol>
+<li><code>[]==[]</code> 的结果是什么</li>
+</ol>
+
+
+<p>  false, 因为这是两个不同的实例对象，所以false，这样就正确了 typeof [] ==  typeof [].</p>
+
+<ol>
+<li>下面的程序输出是什么
+<code>javascript
+'5' + 3
+'5' - 3
+</code></li>
+</ol>
+
+
+<p>  &ldquo;53&rdquo;,2，当+左边是字符串是，执行字符串连接。-号将左边转换成了数字。</p>
+
+<ol>
+<li><p><code>1 + - + + + - + 1</code>执行结果是什么</p>
+
+<p>答案是2。很有趣，当你执行没有空格的语句时，结果为error。//TODO</p></li>
+<li><p>下面程序段的执行结果是什么
+<code>javascript
+var ary = Array(3);
+ary[0]=2
+ary.map(function(elem) { return '1'; });
+</code></p></li>
+</ol>
+
+
+<p>  [&ldquo;1&rdquo;, undefined, undefined]，因为map只对初始化的数组元素有效果。</p>
+
+<ol>
+<li>下面的程序段的结果是什么
+<code>javascript
+function sidEffecting(ary) {
+ary[0] = ary[2];
+}
+function bar(a,b,c) {
+c = 10
+sidEffecting(arguments);
+return a + b + c;
+}
+bar(1,1,1)
+</code></li>
+</ol>
+
+
+<p>  答案是21，arguments这是一个特别变量，是传递给这个函数的参数列表。所以c变为10，a也在执行sidEffection时变成了10，结果变为21。这个也可以从这里找到答案<a href="http://bonsaiden.github.io/JavaScript-Garden/zh/#function.arguments">arguments</a></p>
+
+<ol>
+<li>下面表达式的结果是什么
+<code>javascript
+var a = 111111111111111110000,
+b = 1111;
+a + b;
+</code></li>
+</ol>
+
+
+<p>  同第六个。</p>
+
+<ol>
+<li>下面程序段的结果是什么
+<code>javascript
+var x = [].reverse;
+x();
+</code></li>
+</ol>
+
+
+<p>  是window，[].reverse会返回this指针，当没有明确的接收对象时，会被默认为window</p>
+
+<ol>
+<li><code>Number.MIN_VALUE &gt; 0</code> 正确吗？</li>
+</ol>
+
+
+<p>  正确，因为Number.MIN_VALUE是大于0的最小的数， -Number.MAX_VALUE是最小的数。</p>
+
+<ol>
+<li><code>[1 &lt; 2 &lt; 3, 3 &lt; 2 &lt; 1]</code>的结果是什么</li>
+</ol>
+
+
+<p>  [true, true] 执行顺序为(1 &lt; 2) &lt; 3 和 (3 &lt; 2) &lt; 1， 即 true &lt; 3, false &lt; 1，即true, true</p>
+
+<ol>
+<li><code>2 == [[[2]]]</code>结果是什么</li>
+</ol>
+
+
+<p>  [[2]]转换成为了对象，在比较的时候两边都转换成为了字符串"2"</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[你在浏览器里面输入网址后都发生了什么]]></title>
+    <link href="http://friparia.github.io/blog/2014/08/25/what-happened-after-typing-url-in-your-browser/"/>
+    <updated>2014-08-25T19:11:29+08:00</updated>
+    <id>http://friparia.github.io/blog/2014/08/25/what-happened-after-typing-url-in-your-browser</id>
+    <content type="html"><![CDATA[<p>最近好多面试题里面都有这道题目，而我在看书的时候也在书上发现了差不多的问题，于是就想总结一下这个过程。</p>
+
+<!--more-->
+
+
+<p>当你在地址栏里输入<a href="http://www.friparia.com">www.friparia.com</a>后按下回车，浏览器首先会进行DNS查询，因为对于网络上的计算机来说，它们的地址其实是由一个32位二进制数(IP地址)所确定的，我们人类上网的话没有办法记住这些数字，于是就有了一个分布式的数据库来保存域名和IP地址的映射关系，使我们更方便的上网。我们在网络设置中看到的DNS服务器一般是指我们的本地局域网的DNS缓存服务器，而全球一共有13组根域名服务器。可以在命令行模式下运行<code>nslookup</code>命令进行DNS查询</p>
+
+<p>当进行完DNS查询后，我们的浏览器便知道我们需要访问的地址是198.52.124.101，此时大多数浏览器会发送两个HTTP请求，一个是GET /index.html，一个是GET /favicon.ico，index.html是网站的主页，而favicon.ico这个文件是所对应的那个小图标。</p>
+
+<p>我们拿/index.html的这个请求单独来说，在应用层，使用的是HTTP协议，HTTP是一个在应用层的协议，服务器端一般使用80端口，下面是一个客户端的请求和一个服务器应答的头的例子。</p>
+
+<p><code>c 客户端请求
+GET / HTTP/1.1
+Host:www.friparia.com
+</code>
+<code>c 服务器响应
+HTTP/1.1 200 OK
+Content-Length: 3059
+Server:nginx/1.0.15
+Last-Modified:Mon, 16 Jun 2014 10:08:28 GMT
+Expires:Mon, 25 Aug 2014 10:16:27 GMT
+Date:Mon, 25 Aug 2014 12:39:13 GMT
+Connection:keep-alive
+</code></p>
+
+<p>客户端发出一个HTTP版本为1.1的GET请求，通常客户端请求的方法有GET、POST等，现在RESTful API的设计又将以前不怎么使用的UPDATE、PUT、DELETE等方法用上了。
+服务器收到请求后经过处理就会发出一个响应，这个响应的状态号为200 OK，表示找到所需的文档并且回传过来，我们熟知的404 Not Found也是同样的，其实墙不会返回404，404表示的是服务器能和你有连接但是你所需要的文件不存在，而墙会直接把你的IP数据报给处理掉，当然IE旧版本的做法就是显示本地的404页面。上述仅仅是HTTP头的部分，HTTP内容是由头中的Content-Length所定义的，这内容就是我们index.html的具体内容了。</p>
+
+<p>HTTP协议是应用层上的，是由对应的软件(浏览器/HTTP服务器)所使用的，他会将所有数据按字节流送到传输层，使用TCP协议将数据发送出去。计算机网络按照OSI标准分为七层，分别是物理层、数据链路层、网络层、传输层、会话层、表示层、应用层，但是实际的网络并没有严格的使用这个标准。</p>
+
+<p>在TCP协议中，是端对端的通信，是网络中计算机的进程之间的通信，TCP使用了三次握手和四次挥手来保证传输的可靠性，并且使用滑动窗口来进行拥塞控制，以保证我们的数据能够准确的到达目的地。和TCP同样在传输层的协议是UDP，是不可靠的无连接协议，在刚开始我们所说的DNS就是使用了UDP协议进行传输的。</p>
+
+<p>TCP报文封装好之后，便交给下层的进行IP分片，网络层的通信就是计算机之间的了，是一个IP地址到另一个IP地址，IP是有着最大长度1500字节，所以为了保证传输所以要将TCP报文进行分片，再进行传输。在网络层，我们使用路由器来进行数据的中转，比如我在一个局域网中的IP是192.168.1.101，这时候计算机会将数据发送到网关，即就是直接和你相连的那个路由器(或交换机)，然后路由器查找自己的路由表将数据传送到下个节点，正是这种分布式的网络，以及易于扩展的特性，使得互联网发展的如此迅速。</p>
+
+<p>说完互联网中两台计算机具体是如何通信的后，我们来了解下局域网内计算机和计算机或者说我们的计算机到路由器之间是怎么传送数据的。每一块网卡在出厂的时候都有一个唯一的MAC地址，当我们在局域网内发送数据的时候，就是使用的MAC地址而不是IP进行查找的。比如我们的路由器收到了服务器的响应，现在要将他发送到你的计算机上，它会先发一条广播信息，询问谁是192.168.1.101，在局域网内(一个广播域内)，所有计算机都会收到这条信息，但是只有192.168.1.101进行回答，并且将自己的MAC地址发送回去，路由器便使用这个MAC地址进行局域网内的数据传送，这就是ARP协议。</p>
+
+<p>当这个文件在网络上传输完成时，浏览器会对这个HTML文件进行解析，HTML是一种标记语言，标记一些常用的元素，如标题、段落、表格等，由W3C进行标准的维护。在Webkit(Chrome所使用的内核)中，接受服务器所发送过来的数据，解析成一系列的Tokens，然后在加载结束后建立DOM树，DOM是对HTML或者XML文档的一种结构化表示方法，通过这种方法，用户可以通过提供标准的接口来访问HTML页面中任何元素的相关属性，并可对DOM进行相应的添加、删除和更新操作等。Webkit根据需要来创建Render树，然后基于这个Render树建立一棵新的RenderLayer树，通常各个RenderLayer的内容都绘制在同一块后端储存上，操作系统会将这些储存读取并且渲染在屏幕上。而同时浏览器根据需要进行Javascript的执行等。</p>
+
+<p>简要的叙述了一下从URL输入到页面载入完成发生的事情，基本上都是计算机网络中的，最后的Webkit渲染涉及的不是太多，只是大概看过一本书，没有深入的研究过，也就提一下。</p>
+
+<p>【考研期间刷一下存在。。。。。。。。。</p>
+
+<p>有任何问题可以通过以下方式联系我:</p>
+
+<ul>
+<li><p>邮箱:<a href="&#109;&#x61;&#x69;&#x6c;&#x74;&#111;&#58;&#x66;&#x72;&#105;&#x70;&#97;&#x72;&#105;&#97;&#x40;&#103;&#x6d;&#97;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;">&#x66;&#x72;&#105;&#x70;&#97;&#x72;&#x69;&#x61;&#64;&#103;&#109;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#109;</a></p></li>
+<li><p>irc:<a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#102;&#114;&#x69;&#112;&#x61;&#114;&#105;&#97;&#64;&#x69;&#114;&#x63;&#46;&#x66;&#114;&#101;&#101;&#110;&#x6f;&#x64;&#101;&#46;&#110;&#x65;&#116;">&#102;&#x72;&#105;&#x70;&#x61;&#114;&#x69;&#x61;&#x40;&#x69;&#114;&#x63;&#x2e;&#x66;&#x72;&#101;&#x65;&#110;&#111;&#x64;&#101;&#x2e;&#x6e;&#x65;&#116;</a></p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
