@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Framework | Friparia Blog]]></title>
+  <link href="http://blog.friparia.com/blog/categories/framework/atom.xml" rel="self"/>
+  <link href="http://blog.friparia.com/"/>
+  <updated>2015-03-24T15:28:10+08:00</updated>
+  <id>http://blog.friparia.com/</id>
+  <author>
+    <name><![CDATA[Friparia]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[信息系统中的权限控制(一)：基于业务逻辑]]></title>
+    <link href="http://blog.friparia.com/blog/2015/03/24/access-control-part-one/"/>
+    <updated>2015-03-24T18:51:04+08:00</updated>
+    <id>http://blog.friparia.com/blog/2015/03/24/access-control-part-one</id>
+    <content type="html"><![CDATA[<p>互联网不断地发展，为信息的共享提供了一个更加完善的解决方案，提供了一个信息更加对等的环境。但是，我们不能无条件的扩散信息，一些敏感信息不能够对非授权用户提供，所以我们就需要对我们的信息系统进行访问控制，来保证企业等在信息系统中储存和处理的信息的安全。最近在对信息系统做一套访问控制，结合以前的开发，大概总结了一下几种权限控制的方法：基于业务逻辑、基于层级、基于角色、基于资源等权限控制方法，我们由最简单的基于业务逻辑的入手，对他们进行一个详细的讨论。</p>
+
+<!--more-->
+
+
+<h1>基于业务逻辑的权限控制</h1>
+
+<p>基于业务逻辑的权限控制其实是最容易理解的，就是哪里需要权限控制就去哪里具体实现我自己的代码，比如我们对某个页面，某个操作进行控制，只能某些人进行访问，只能在逻辑代码前再贴上自己的权限控制逻辑</p>
+
+<p><code>php SomePage.php
+&lt;?php
+if(!checkAuth()){
+  die(403);//somebody that can not visit
+}
+//do something
+?&gt;
+</code></p>
+
+<p>或者在具体某个地方再进行判断
+```php SomeOtherPage.php
+//some classic php operation
+$action = $_GET[&lsquo;action&rsquo;];
+switch($action){
+  case &lsquo;action_one&rsquo;:</p>
+
+<pre><code>//some thing
+break;
+</code></pre>
+
+<p>  case &lsquo;action_two&rsquo;:</p>
+
+<pre><code>if(!someCheck()){
+  die(403);
+}
+//access controlled thing
+break;
+</code></pre>
+
+<p>  default:</p>
+
+<pre><code>//other thing
+</code></pre>
+
+<p>}
+```</p>
+
+<p>如果我们的信息系统比较容易，用户的分类也比较单一（比如就只有管理员和用户），我们就可以使用这种简单粗暴的方法进行权限控制，在这种时候，我们的基本上是比较低的，不管是需要写的代码还是需要思考的时间。但是，这个在软件工程中有一种非常明显的缺陷，就是几乎没有扩展性和维护性，要想对某个页面进行权限控制，基本上靠复制粘贴。</p>
+
+<p>当我们的信息系统变得庞大起来时，我们的技术部门的人员不仅仅是两三个人的时候，我们就需要更加灵活、方便的权限控制方式，这时候基于业务逻辑的权限控制就显现出了其局限性，我们如果继续采用基于业务逻辑的权限控制的话，那么我们的代码就会变得异常庞大，变得不易维护，而且也不利于多人开发，我们就需要一个更加优秀的模型来替代这种权限检查的方式，这就是我们下次将会提到的基于层级的权限控制。</p>
+]]></content>
+  </entry>
+  
+</feed>
