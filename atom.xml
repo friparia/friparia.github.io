@@ -2,17 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Friparia Blog]]></title>
-<<<<<<< HEAD
   <link href="http://blog.friparia.com/atom.xml" rel="self"/>
   <link href="http://blog.friparia.com/"/>
   <updated>2015-03-24T15:45:08+08:00</updated>
   <id>http://blog.friparia.com/</id>
-=======
-  <link href="http://friparia.github.io/atom.xml" rel="self"/>
-  <link href="http://friparia.github.io/"/>
-  <updated>2014-12-18T21:56:33+08:00</updated>
-  <id>http://friparia.github.io/</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
   <author>
     <name><![CDATA[Friparia]]></name>
     
@@ -21,7 +14,6 @@
 
   
   <entry>
-<<<<<<< HEAD
     <title type="html"><![CDATA[信息系统中的权限控制(一)：基于业务逻辑]]></title>
     <link href="http://blog.friparia.com/blog/2015/03/24/access-control-part-one/"/>
     <updated>2015-03-24T18:51:04+08:00</updated>
@@ -96,12 +88,6 @@
     <link href="http://blog.friparia.com/blog/2014/08/25/what-happened-after-typing-url-in-your-browser/"/>
     <updated>2014-08-25T19:11:29+08:00</updated>
     <id>http://blog.friparia.com/blog/2014/08/25/what-happened-after-typing-url-in-your-browser</id>
-=======
-    <title type="html"><![CDATA[你在浏览器里面输入网址后都发生了什么]]></title>
-    <link href="http://friparia.github.io/blog/2014/08/25/what-happened-after-typing-url-in-your-browser/"/>
-    <updated>2014-08-25T19:11:29+08:00</updated>
-    <id>http://friparia.github.io/blog/2014/08/25/what-happened-after-typing-url-in-your-browser</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
     <content type="html"><![CDATA[<p>最近好多面试题里面都有这道题目，而我在看书的时候也在书上发现了差不多的问题，于是就想总结一下这个过程。</p>
 
 <!--more-->
@@ -157,13 +143,8 @@
 <p>有任何问题可以通过以下方式联系我:</p>
 
 <ul>
-<<<<<<< HEAD
 <li><p>邮箱:<a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x66;&#x72;&#105;&#112;&#97;&#x72;&#105;&#97;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#111;&#109;">&#x66;&#114;&#x69;&#112;&#97;&#x72;&#x69;&#97;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#x6d;</a></p></li>
 <li><p>irc:<a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x66;&#x72;&#x69;&#x70;&#97;&#x72;&#105;&#97;&#64;&#105;&#x72;&#99;&#x2e;&#x66;&#114;&#x65;&#x65;&#110;&#x6f;&#x64;&#101;&#46;&#x6e;&#x65;&#116;">&#x66;&#x72;&#105;&#112;&#97;&#x72;&#x69;&#x61;&#64;&#105;&#x72;&#x63;&#46;&#102;&#x72;&#x65;&#x65;&#x6e;&#111;&#100;&#101;&#46;&#110;&#101;&#x74;</a></p></li>
-=======
-<li><p>邮箱:<a href="&#109;&#x61;&#x69;&#108;&#x74;&#111;&#58;&#x66;&#114;&#105;&#x70;&#97;&#x72;&#x69;&#x61;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#109;">&#x66;&#x72;&#105;&#x70;&#x61;&#x72;&#105;&#97;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;</a></p></li>
-<li><p>irc:<a href="&#x6d;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#102;&#x72;&#x69;&#112;&#x61;&#x72;&#105;&#97;&#x40;&#x69;&#x72;&#x63;&#x2e;&#x66;&#114;&#x65;&#101;&#x6e;&#x6f;&#100;&#x65;&#46;&#110;&#101;&#x74;">&#102;&#x72;&#105;&#112;&#97;&#x72;&#105;&#x61;&#64;&#x69;&#114;&#99;&#x2e;&#102;&#x72;&#101;&#x65;&#110;&#111;&#100;&#101;&#x2e;&#110;&#101;&#x74;</a></p></li>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
 </ul>
 
 ]]></content>
@@ -171,15 +152,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel 带参数的命令行开发]]></title>
-<<<<<<< HEAD
     <link href="http://blog.friparia.com/blog/2014/06/16/laravel-command-with-option-chs/"/>
     <updated>2014-06-16T17:27:33+08:00</updated>
     <id>http://blog.friparia.com/blog/2014/06/16/laravel-command-with-option-chs</id>
-=======
-    <link href="http://friparia.github.io/blog/2014/06/16/laravel-command-with-option-chs/"/>
-    <updated>2014-06-16T17:27:33+08:00</updated>
-    <id>http://friparia.github.io/blog/2014/06/16/laravel-command-with-option-chs</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
     <content type="html"><![CDATA[<p>上一次我们简要介绍了Laravel中命令行的不带参数或者选项的开发，今天我们要完善我们上一次的压缩css的工作，使得我们可以压缩我们指定的css文件，如以下命令所示</p>
 
 <!--more-->
@@ -319,15 +294,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel 命令行开发入门]]></title>
-<<<<<<< HEAD
     <link href="http://blog.friparia.com/blog/2014/05/17/laravel-command-line-walkthrough/"/>
     <updated>2014-05-17T23:08:46+08:00</updated>
     <id>http://blog.friparia.com/blog/2014/05/17/laravel-command-line-walkthrough</id>
-=======
-    <link href="http://friparia.github.io/blog/2014/05/17/laravel-command-line-walkthrough/"/>
-    <updated>2014-05-17T23:08:46+08:00</updated>
-    <id>http://friparia.github.io/blog/2014/05/17/laravel-command-line-walkthrough</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
     <content type="html"><![CDATA[<p>上一篇我们试过了Laravel中的包开发，我们可以创建自己的包，并且复用他们，来很快的构建我们的应用，这一次我们来简要介绍一下Laravel中另一个强大的功能，Artisan命令行，当然，文档是一切的基础<a href="http://www.golaravel.com/docs/4.1/commands/">中文文档</a>，这个可能稍微有点过时，如生成使得<code>--bench</code>的参数在新版本中就已经去掉了，所以看<a href="https://www.laravel.com/">英文文档</a>是一个不错的选择</p>
 
 <!--more-->
@@ -545,15 +514,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel 插件开发入门]]></title>
-<<<<<<< HEAD
     <link href="http://blog.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
     <updated>2014-04-18T22:38:49+08:00</updated>
     <id>http://blog.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough</id>
-=======
-    <link href="http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
-    <updated>2014-04-18T22:38:49+08:00</updated>
-    <id>http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
     <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
 看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
 
@@ -695,15 +658,9 @@ vendor是自己的厂商名或者组织或者个人的名字，package就是具�
   
   <entry>
     <title type="html"><![CDATA[Vim总结]]></title>
-<<<<<<< HEAD
     <link href="http://blog.friparia.com/blog/2014/03/31/vimzong-jie/"/>
     <updated>2014-03-31T13:54:35+08:00</updated>
     <id>http://blog.friparia.com/blog/2014/03/31/vimzong-jie</id>
-=======
-    <link href="http://friparia.github.io/blog/2014/03/31/vimzong-jie/"/>
-    <updated>2014-03-31T13:54:35+08:00</updated>
-    <id>http://friparia.github.io/blog/2014/03/31/vimzong-jie</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
     <content type="html"><![CDATA[<p>这两天在看vim，顺手总结了下不知道但是觉得很有用命令</p>
 
 <!--more-->

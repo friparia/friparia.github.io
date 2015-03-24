@@ -2,17 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Tag: framework,php,packages | Friparia Blog]]></title>
-<<<<<<< HEAD
   <link href="http://blog.friparia.com/tags/framework-php-packages/atom.xml" rel="self"/>
   <link href="http://blog.friparia.com/"/>
   <updated>2015-03-24T15:45:08+08:00</updated>
   <id>http://blog.friparia.com/</id>
-=======
-  <link href="http://friparia.github.io/tags/framework-php-packages/atom.xml" rel="self"/>
-  <link href="http://friparia.github.io/"/>
-  <updated>2014-12-18T21:56:33+08:00</updated>
-  <id>http://friparia.github.io/</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
   <author>
     <name><![CDATA[Friparia]]></name>
     
@@ -22,15 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Laravel 插件开发入门]]></title>
-<<<<<<< HEAD
     <link href="http://blog.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
     <updated>2014-04-18T22:38:49+08:00</updated>
     <id>http://blog.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough</id>
-=======
-    <link href="http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
-    <updated>2014-04-18T22:38:49+08:00</updated>
-    <id>http://friparia.github.io/blog/2014/04/18/laravel-package-develop-walkthrough</id>
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
     <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
 看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
 

@@ -1,8 +1,4 @@
 User-agent: *
 Disallow: 
 
-<<<<<<< HEAD
 Sitemap: http://blog.friparia.com/sitemap.xml 
-=======
-Sitemap: http://friparia.github.io/sitemap.xml 
->>>>>>> 01e719a3689e8a10ad87551bf97c1f9a22060c03
