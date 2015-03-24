@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Friparia Blog]]></title>
+  <link href="http://blog.friparia.com/atom.xml" rel="self"/>
+  <link href="http://blog.friparia.com/"/>
+  <updated>2015-03-24T15:45:08+08:00</updated>
+  <id>http://blog.friparia.com/</id>
+  <author>
+    <name><![CDATA[Friparia]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[信息系统中的权限控制(一)：基于业务逻辑]]></title>
+    <link href="http://blog.friparia.com/blog/2015/03/24/access-control-part-one/"/>
+    <updated>2015-03-24T18:51:04+08:00</updated>
+    <id>http://blog.friparia.com/blog/2015/03/24/access-control-part-one</id>
+    <content type="html"><![CDATA[<p>互联网不断地发展，为信息的共享提供了一个更加完善的解决方案，提供了一个信息更加对等的环境。但是，我们不能无条件的扩散信息，一些敏感信息不能够对非授权用户提供，所以我们就需要对我们的信息系统进行访问控制，来保证企业等在信息系统中储存和处理的信息的安全。最近在对信息系统做一套访问控制，结合以前的开发，大概总结了一下几种权限控制的方法：基于业务逻辑、基于层级、基于角色、基于资源等权限控制方法，我们由最简单的基于业务逻辑的入手，对他们进行一个详细的讨论。</p>
+
+<!--more-->
+
+
+<h1>基于业务逻辑的权限控制</h1>
+
+<p>基于业务逻辑的权限控制其实是最容易理解的，就是哪里需要权限控制就去哪里具体实现我自己的代码，比如我们对某个页面，某个操作进行控制，只能某些人进行访问，只能在逻辑代码前再贴上自己的权限控制逻辑</p>
+
+<figure class='code'><figcaption><span>SomePage.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">checkAuth</span><span class="p">()){</span>
+</span><span class='line'>  <span class="k">die</span><span class="p">(</span><span class="mi">403</span><span class="p">);</span><span class="c1">//somebody that can not visit</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'><span class="c1">//do something </span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>或者在具体某个地方再进行判断</p>
+
+<figure class='code'><figcaption><span>SomeOtherPage.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">//some classic php operation</span>
+</span><span class='line'><span class="nv">$action</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">];</span>
+</span><span class='line'><span class="k">switch</span><span class="p">(</span><span class="nv">$action</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">case</span> <span class="s1">&#39;action_one&#39;</span><span class="o">:</span>
+</span><span class='line'>    <span class="c1">//some thing</span>
+</span><span class='line'>    <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">case</span> <span class="s1">&#39;action_two&#39;</span><span class="o">:</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">someCheck</span><span class="p">()){</span>
+</span><span class='line'>      <span class="k">die</span><span class="p">(</span><span class="mi">403</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="c1">//access controlled thing</span>
+</span><span class='line'>    <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">default</span><span class="o">:</span>
+</span><span class='line'>    <span class="c1">//other thing</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果我们的信息系统比较容易，用户的分类也比较单一（比如就只有管理员和用户），我们就可以使用这种简单粗暴的方法进行权限控制，在这种时候，我们的基本上是比较低的，不管是需要写的代码还是需要思考的时间。但是，这个在软件工程中有一种非常明显的缺陷，就是几乎没有扩展性和维护性，要想对某个页面进行权限控制，基本上靠复制粘贴。</p>
+
+<p>当我们的信息系统变得庞大起来时，我们的技术部门的人员不仅仅是两三个人的时候，我们就需要更加灵活、方便的权限控制方式，这时候基于业务逻辑的权限控制就显现出了其局限性，我们如果继续采用基于业务逻辑的权限控制的话，那么我们的代码就会变得异常庞大，变得不易维护，而且也不利于多人开发，我们就需要一个更加优秀的模型来替代这种权限检查的方式，这就是我们下次将会提到的基于层级的权限控制。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[你在浏览器里面输入网址后都发生了什么]]></title>
+    <link href="http://blog.friparia.com/blog/2014/08/25/what-happened-after-typing-url-in-your-browser/"/>
+    <updated>2014-08-25T19:11:29+08:00</updated>
+    <id>http://blog.friparia.com/blog/2014/08/25/what-happened-after-typing-url-in-your-browser</id>
+    <content type="html"><![CDATA[<p>最近好多面试题里面都有这道题目，而我在看书的时候也在书上发现了差不多的问题，于是就想总结一下这个过程。</p>
+
+<!--more-->
+
+
+<p>当你在地址栏里输入<a href="http://www.friparia.com">www.friparia.com</a>后按下回车，浏览器首先会进行DNS查询，因为对于网络上的计算机来说，它们的地址其实是由一个32位二进制数(IP地址)所确定的，我们人类上网的话没有办法记住这些数字，于是就有了一个分布式的数据库来保存域名和IP地址的映射关系，使我们更方便的上网。我们在网络设置中看到的DNS服务器一般是指我们的本地局域网的DNS缓存服务器，而全球一共有13组根域名服务器。可以在命令行模式下运行<code>nslookup</code>命令进行DNS查询</p>
+
+<p>当进行完DNS查询后，我们的浏览器便知道我们需要访问的地址是198.52.124.101，此时大多数浏览器会发送两个HTTP请求，一个是GET /index.html，一个是GET /favicon.ico，index.html是网站的主页，而favicon.ico这个文件是所对应的那个小图标。</p>
+
+<p>我们拿/index.html的这个请求单独来说，在应用层，使用的是HTTP协议，HTTP是一个在应用层的协议，服务器端一般使用80端口，下面是一个客户端的请求和一个服务器应答的头的例子。</p>
+
+<figure class='code'><figcaption><span>客户端请求</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">GET</span> <span class="o">/</span> <span class="n">HTTP</span><span class="o">/</span><span class="mf">1.1</span>
+</span><span class='line'><span class="nl">Host:</span><span class="n">www</span><span class="p">.</span><span class="n">friparia</span><span class="p">.</span><span class="n">com</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><figcaption><span>服务器响应</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">HTTP</span><span class="o">/</span><span class="mf">1.1</span> <span class="mi">200</span> <span class="n">OK</span>
+</span><span class='line'><span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="o">:</span> <span class="mi">3059</span>
+</span><span class='line'><span class="nl">Server:</span><span class="n">nginx</span><span class="o">/</span><span class="mf">1.0.15</span>
+</span><span class='line'><span class="n">Last</span><span class="o">-</span><span class="n">Modified</span><span class="o">:</span><span class="n">Mon</span><span class="p">,</span> <span class="mi">16</span> <span class="n">Jun</span> <span class="mi">2014</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">28</span> <span class="n">GMT</span>
+</span><span class='line'><span class="nl">Expires:</span><span class="n">Mon</span><span class="p">,</span> <span class="mi">25</span> <span class="n">Aug</span> <span class="mi">2014</span> <span class="mi">10</span><span class="o">:</span><span class="mi">16</span><span class="o">:</span><span class="mi">27</span> <span class="n">GMT</span>
+</span><span class='line'><span class="nl">Date:</span><span class="n">Mon</span><span class="p">,</span> <span class="mi">25</span> <span class="n">Aug</span> <span class="mi">2014</span> <span class="mi">12</span><span class="o">:</span><span class="mi">39</span><span class="o">:</span><span class="mi">13</span> <span class="n">GMT</span>
+</span><span class='line'><span class="nl">Connection:</span><span class="n">keep</span><span class="o">-</span><span class="n">alive</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>客户端发出一个HTTP版本为1.1的GET请求，通常客户端请求的方法有GET、POST等，现在RESTful API的设计又将以前不怎么使用的UPDATE、PUT、DELETE等方法用上了。
+服务器收到请求后经过处理就会发出一个响应，这个响应的状态号为200 OK，表示找到所需的文档并且回传过来，我们熟知的404 Not Found也是同样的，其实墙不会返回404，404表示的是服务器能和你有连接但是你所需要的文件不存在，而墙会直接把你的IP数据报给处理掉，当然IE旧版本的做法就是显示本地的404页面。上述仅仅是HTTP头的部分，HTTP内容是由头中的Content-Length所定义的，这内容就是我们index.html的具体内容了。</p>
+
+<p>HTTP协议是应用层上的，是由对应的软件(浏览器/HTTP服务器)所使用的，他会将所有数据按字节流送到传输层，使用TCP协议将数据发送出去。计算机网络按照OSI标准分为七层，分别是物理层、数据链路层、网络层、传输层、会话层、表示层、应用层，但是实际的网络并没有严格的使用这个标准。</p>
+
+<p>在TCP协议中，是端对端的通信，是网络中计算机的进程之间的通信，TCP使用了三次握手和四次挥手来保证传输的可靠性，并且使用滑动窗口来进行拥塞控制，以保证我们的数据能够准确的到达目的地。和TCP同样在传输层的协议是UDP，是不可靠的无连接协议，在刚开始我们所说的DNS就是使用了UDP协议进行传输的。</p>
+
+<p>TCP报文封装好之后，便交给下层的进行IP分片，网络层的通信就是计算机之间的了，是一个IP地址到另一个IP地址，IP是有着最大长度1500字节，所以为了保证传输所以要将TCP报文进行分片，再进行传输。在网络层，我们使用路由器来进行数据的中转，比如我在一个局域网中的IP是192.168.1.101，这时候计算机会将数据发送到网关，即就是直接和你相连的那个路由器(或交换机)，然后路由器查找自己的路由表将数据传送到下个节点，正是这种分布式的网络，以及易于扩展的特性，使得互联网发展的如此迅速。</p>
+
+<p>说完互联网中两台计算机具体是如何通信的后，我们来了解下局域网内计算机和计算机或者说我们的计算机到路由器之间是怎么传送数据的。每一块网卡在出厂的时候都有一个唯一的MAC地址，当我们在局域网内发送数据的时候，就是使用的MAC地址而不是IP进行查找的。比如我们的路由器收到了服务器的响应，现在要将他发送到你的计算机上，它会先发一条广播信息，询问谁是192.168.1.101，在局域网内(一个广播域内)，所有计算机都会收到这条信息，但是只有192.168.1.101进行回答，并且将自己的MAC地址发送回去，路由器便使用这个MAC地址进行局域网内的数据传送，这就是ARP协议。</p>
+
+<p>当这个文件在网络上传输完成时，浏览器会对这个HTML文件进行解析，HTML是一种标记语言，标记一些常用的元素，如标题、段落、表格等，由W3C进行标准的维护。在Webkit(Chrome所使用的内核)中，接受服务器所发送过来的数据，解析成一系列的Tokens，然后在加载结束后建立DOM树，DOM是对HTML或者XML文档的一种结构化表示方法，通过这种方法，用户可以通过提供标准的接口来访问HTML页面中任何元素的相关属性，并可对DOM进行相应的添加、删除和更新操作等。Webkit根据需要来创建Render树，然后基于这个Render树建立一棵新的RenderLayer树，通常各个RenderLayer的内容都绘制在同一块后端储存上，操作系统会将这些储存读取并且渲染在屏幕上。而同时浏览器根据需要进行Javascript的执行等。</p>
+
+<p>简要的叙述了一下从URL输入到页面载入完成发生的事情，基本上都是计算机网络中的，最后的Webkit渲染涉及的不是太多，只是大概看过一本书，没有深入的研究过，也就提一下。</p>
+
+<p>【考研期间刷一下存在。。。。。。。。。</p>
+
+<p>有任何问题可以通过以下方式联系我:</p>
+
+<ul>
+<li><p>邮箱:<a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x66;&#x72;&#105;&#112;&#97;&#x72;&#105;&#97;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#111;&#109;">&#x66;&#114;&#x69;&#112;&#97;&#x72;&#x69;&#97;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#x6d;</a></p></li>
+<li><p>irc:<a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x66;&#x72;&#x69;&#x70;&#97;&#x72;&#105;&#97;&#64;&#105;&#x72;&#99;&#x2e;&#x66;&#114;&#x65;&#x65;&#110;&#x6f;&#x64;&#101;&#46;&#x6e;&#x65;&#116;">&#x66;&#x72;&#105;&#112;&#97;&#x72;&#x69;&#x61;&#64;&#105;&#x72;&#x63;&#46;&#102;&#x72;&#x65;&#x65;&#x6e;&#111;&#100;&#101;&#46;&#110;&#101;&#x74;</a></p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel 带参数的命令行开发]]></title>
+    <link href="http://blog.friparia.com/blog/2014/06/16/laravel-command-with-option-chs/"/>
+    <updated>2014-06-16T17:27:33+08:00</updated>
+    <id>http://blog.friparia.com/blog/2014/06/16/laravel-command-with-option-chs</id>
+    <content type="html"><![CDATA[<p>上一次我们简要介绍了Laravel中命令行的不带参数或者选项的开发，今天我们要完善我们上一次的压缩css的工作，使得我们可以压缩我们指定的css文件，如以下命令所示</p>
+
+<!--more-->
+
+
+<p><code>php artisan compress:css --file=public/css/example.css</code>或者<code>php artisan compress:css -f public/css/example.css</code></p>
+
+<p>这就我们需要来了解上一次被我们注释掉的<code>getArguments()</code>和<code>getOptions()</code>方法，这两个方法是由Laravel提供的，为了自定义自己的参数或者选项而设置的。</p>
+
+<h2>getArguments</h2>
+
+<p>这个函数返回一个数组，数组中的元素定义为</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">array</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$mode</span><span class="p">,</span> <span class="nv">$description</span><span class="p">,</span> <span class="nv">$defaultValue</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>$name</code>是参数的名字，<code>$mode</code>是其模式，这个函数有这两个值:</p>
+
+<ul>
+<li><code>InputArgument::REQUIRED</code>，表示这个参数是必须的，如果在使用命令的时候没有输入，则会报错</li>
+<li><code>InputArgument::OPTIONAL</code>，这个则表示是可选的，在使用命令时可以不用。
+<code>$description</code>是这个参数的描述，在<code>--hlep</code>时会显示其描述，<code>$defaultValue</code>顾名思义即为这个参数的默认值</li>
+</ul>
+
+
+<h2>getOptions</h2>
+
+<p>要想实现开头所说的效果，于是我们就着重使用getOptions这个函数，同样和<code>getArguments</code>返回相同的数组，不过数组中的元素不一样</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">array</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$shortcut</span><span class="p">,</span> <span class="nv">$mode</span><span class="p">,</span> <span class="nv">$description</span><span class="p">,</span> <span class="nv">$defaultValue</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>多了一个<code>$shortcut</code>选项，在我们的例子中我们可以将其设置成为<code>-f</code>，而其模式<code>$mode</code>也有不同，如下所示:</p>
+
+<ul>
+<li><code>InputOption::VALUE_REQUIRED</code>，表明这个参数是必须的</li>
+<li><code>InputOption::VALUE_OPTIONAL</code>，表明这个参数是可选的</li>
+<li><code>InputOption::VALUE_IS_ARRAY</code> ，表明这个参数是一个数组，使用命令时呈现这种形式<code>--option=value1 --option=value2</code></li>
+<li><code>InputOption::VALUE_NONE</code>，表明只是一个开关而没有具体参数，如同我们在编译安装时的<code>--with-xxx</code></li>
+</ul>
+
+
+<p>了解了我们的函数后我们就可以完成我们的方法了:</p>
+
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="sd">/**</span>
+</span><span class='line'><span class="sd"> * Get the console command options.</span>
+</span><span class='line'><span class="sd"> *</span>
+</span><span class='line'><span class="sd"> * @return array</span>
+</span><span class='line'><span class="sd"> */</span>
+</span><span class='line'><span class="k">protected</span> <span class="k">function</span> <span class="nf">getOptions</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>      <span class="k">array</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="nx">InputOption</span><span class="o">::</span><span class="na">VALUE_OPTIONAL</span><span class="p">,</span> <span class="s1">&#39;Compress an input css file&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">),</span>
+</span><span class='line'>  <span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>完成这两个函数后我们可以通过这样的方法得到我们的选项或者参数值</p>
+
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">argument</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">);</span> <span class="c1">//获取$name为&quot;file&quot;的参数的值</span>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">argument</span><span class="p">();</span> <span class="c1">//获得所有参数的数组</span>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">option</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">);</span> <span class="c1">//获取$name为&quot;file&quot;的选项的值</span>
+</span><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">option</span><span class="p">();</span> <span class="c1">//获得所有选项的数组</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后我们完成最后的逻辑，修改我们的<code>fire()</code>函数为:</p>
+
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">fire</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="nv">$inputfile</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">option</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nb">is_null</span><span class="p">(</span><span class="nv">$inputfile</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">confirm</span><span class="p">(</span><span class="s1">&#39;Compress all css files?[Yes/No]&#39;</span><span class="p">)){</span>
+</span><span class='line'>      <span class="c1">// 上一次我们书写的代码</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">confirm</span><span class="p">(</span><span class="s1">&#39;Compress this &#39;</span><span class="o">.</span><span class="nv">$inputfile</span><span class="o">.</span><span class="s1">&#39; css files?[Yes/No]&#39;</span><span class="p">)){</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;compressing ...&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$inputfile</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$cssdir</span> <span class="o">=</span> <span class="nx">public_path</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;/css&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$compressed_filename</span> <span class="o">=</span> <span class="nv">$cssdir</span><span class="o">.</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nb">time</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;_compressed.min.css&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$path_parts</span> <span class="o">=</span> <span class="nb">pathinfo</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nv">$path_parts</span><span class="p">[</span><span class="s1">&#39;extension&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;css&#39;</span><span class="p">){</span>
+</span><span class='line'>            <span class="nv">$minified</span> <span class="o">=</span> <span class="nx">Assetcompresser</span><span class="o">::</span><span class="na">minifycss</span><span class="p">(</span><span class="nx">base_path</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$compressed_filename</span><span class="p">,</span> <span class="nv">$minified</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">line</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;css has compressed! The file&#39;</span><span class="o">.</span><span class="nv">$compressed_filename</span><span class="o">.</span><span class="s1">&#39; generated&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>总结</h1>
+
+<p>这个asset压缩的包我会上传到我的github和packagist上去，并且将其功能完善得更好，欢迎大家拍砖……</p>
+
+<p>这样我们的Laravel的命令行攻略也算介绍完了，个人觉得主要是因为文档中没有一个确定的例子来带着做有可能在第一次使用到的时候遇到麻烦，所以写了这几篇，也算是练练手，非常感谢<a href="http://weibo.com/byrwdjwxh">@耗子飞飞飞_BYR</a>给予的指导~接下来可能会准备深入了解一下Laravel的框架，然后在更深的层面上写一点东西。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel 命令行开发入门]]></title>
+    <link href="http://blog.friparia.com/blog/2014/05/17/laravel-command-line-walkthrough/"/>
+    <updated>2014-05-17T23:08:46+08:00</updated>
+    <id>http://blog.friparia.com/blog/2014/05/17/laravel-command-line-walkthrough</id>
+    <content type="html"><![CDATA[<p>上一篇我们试过了Laravel中的包开发，我们可以创建自己的包，并且复用他们，来很快的构建我们的应用，这一次我们来简要介绍一下Laravel中另一个强大的功能，Artisan命令行，当然，文档是一切的基础<a href="http://www.golaravel.com/docs/4.1/commands/">中文文档</a>，这个可能稍微有点过时，如生成使得<code>--bench</code>的参数在新版本中就已经去掉了，所以看<a href="https://www.laravel.com/">英文文档</a>是一个不错的选择</p>
+
+<!--more-->
+
+
+<h1>准备</h1>
+
+<p>所有的新东西都得需要曾经的基础，首先的基础就是Laravel的开发的基础了，如果使用过命令行，比如数据库迁移命令的话会更好的理解。应用命令行我们能够更好更快的构建我们的应用，或者对我们的应用进行一些命令行的操作。</p>
+
+<h1>创建</h1>
+
+<p>我们可能有两种不同的命令行开发，一种是在应用中的，可以简单的理解为我们的代码都是写在<code>app/commands</code>这个目录下的，另一种是在开发的包中的，也可以理解为我们所写的命令行代码是在<code>workbench/vendor/package/src/Vendor/Package/</code>文件中的，区别我们稍后会提到。</p>
+
+<p>运行<code>php artisan command:make YourCommand</code>就可以创建一个命令了，默认是创建在你的应用中，即<code>app/commands</code>这个目录中，而如果我们需要创建在自己开发的包中的命令的话，我们就需要加上<code>--path=workbench/vendor/package/src/Vendor/Package</code>这个参数，这样我们创建的命令才可以随着包的发布而进行使用了。</p>
+
+<h1>实现</h1>
+
+<p>用命令行就可以搭一个很不错的架子出来，我们可以打开生成的<code>workbench/vendor/package/src/commands/YourCommand.php</code>这个文件，来完成我们具体的命令实现。
+由于<code>--bench</code>参数不再支持，所以我们手动在开始加入</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">namespace</span> <span class="nx">Vendor\Package</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这一行，使得我们的包能够找到所对应的命令。</p>
+
+<p>在<code>YourCommand</code>这个类中我们可以看到这几个方法:</p>
+
+<ul>
+<li><code>__consruct()</code>，当然这个是默认的构造函数没什么可说的</li>
+<li><code>fire()</code>， 这个函数是在我们运行命令的时候所执行的函数，即我们需要实现的具体逻辑代码就是写在这个里面的</li>
+<li><code>getArguments()</code>和<code>getOptions()</code>是得到命令的参数和选项，如果有参数设置的需要，我们可以通过<code>$this-&gt;argument('name')</code>和<code>$this-&gt;option('name')</code>来获得我们所需要的参数。
+同时还有两个属性:</li>
+<li><code>$name</code>，是这个命令的名字，即在命令行中所敲的</li>
+<li><code>$description</code>，是这个命令的描述，会对这个命令进行一个简要的描述</li>
+</ul>
+
+
+<p>了解了这些之后我们就可以完成我们的<code>fire()</code>函数了，我们可能用得到的输出函数<code>info</code>,<code>comment</code>,<code>question</code>,<code>error</code>等可以以一种简单的方式使用。
+比如我们在刚开始询问是否生成，就可以写下以下代码:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">if</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">confirm</span><span class="p">(</span><span class="s1">&#39;确定生成?[Y|N]){</span>
+</span><span class='line'><span class="s1">  $this-&gt;info(&#39;</span><span class="err">生成中</span><span class="o">....</span><span class="err">&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样我们就能够写出我们的具体的命令了，下面我们以一个压缩assets的命令例子来详细叙述整个包命令开发的过程</p>
+
+<h1>例子</h1>
+
+<p>首先按照<a href="http://www.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough/">包生成</a>来生成一个assetcompress的包，然后执行<code>command:make</code>命令在包内生成一个compress css的命令，我们执行的是<code>php artisan command:make CompressCssCommand --path=workbench/friparia/assetcompresser/src/Friparia/Assetcompresser</code></p>
+
+<p>然后打开<code>workbench/vendor/package/src/commands/</code>文件夹中刚才生成的文件，按照上述加入namespace我们来设定我们这个命令和描述</p>
+
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">protected</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">&#39;compress:css&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="k">protected</span> <span class="nv">$description</span> <span class="o">=</span> <span class="s1">&#39;Compress your css files to save your network traffic. No parameter means compress all css files in public/css in one file and &quot;--file&quot; means compress specify file&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样当我们运行<code>php artisan</code>时我们就可以看到我们的命令以及说明了，然后完成<code>fire()</code>方法，我们先完成不加参数的方法(此时需要先将<code>getArguments()</code>和<code>getOptions()</code>两个方法注释掉)</p>
+
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">fire</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">confirm</span><span class="p">(</span><span class="s1">&#39;Compress all css files?[Yes/No]&#39;</span><span class="p">)){</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">line</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;compressing ...&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="nv">$cssdir</span> <span class="o">=</span> <span class="nx">public_path</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;/css&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="nv">$compressed_filename</span> <span class="o">=</span> <span class="nv">$cssdir</span><span class="o">.</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nb">time</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;_compressed.min.css&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$cssdir</span><span class="p">)){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nv">$dh</span> <span class="o">=</span> <span class="nb">opendir</span><span class="p">(</span><span class="nv">$cssdir</span><span class="p">)){</span>
+</span><span class='line'>                <span class="nv">$minified</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>                <span class="k">while</span><span class="p">(</span><span class="nv">$file</span> <span class="o">=</span> <span class="nb">readdir</span><span class="p">(</span><span class="nv">$dh</span><span class="p">)){</span>
+</span><span class='line'>                    <span class="k">if</span><span class="p">(</span><span class="nv">$file</span> <span class="o">!=</span> <span class="s1">&#39;.&#39;</span> <span class="o">&amp;&amp;</span> <span class="nv">$file</span> <span class="o">!=</span> <span class="s1">&#39;..&#39;</span><span class="p">){</span>
+</span><span class='line'>                        <span class="nv">$path_parts</span> <span class="o">=</span> <span class="nb">pathinfo</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>                        <span class="k">if</span><span class="p">(</span><span class="nv">$path_parts</span><span class="p">[</span><span class="s1">&#39;extension&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;css&#39;</span><span class="p">){</span>
+</span><span class='line'>                            <span class="nv">$minified</span> <span class="o">.=</span> <span class="nx">Assetcompresser</span><span class="o">::</span><span class="na">minifycss</span><span class="p">(</span><span class="nv">$cssdir</span><span class="o">.</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="nv">$file</span><span class="p">);</span>
+</span><span class='line'>                        <span class="p">}</span>
+</span><span class='line'>                    <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>                <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$compressed_filename</span><span class="p">,</span> <span class="nv">$minified</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">line</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;css has compressed! The file&#39;</span><span class="o">.</span><span class="nv">$compressed_filename</span><span class="o">.</span><span class="s1">&#39; generated&#39;</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="s1">&#39;Cannot open &#39;</span><span class="o">.</span><span class="nv">$cssdir</span><span class="p">);</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nv">$cssdir</span><span class="o">.</span><span class="s2">&quot;does not exist&quot;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>我们有使用到<code>Assetcompresser::minifycss()</code>来压缩css，即我们这个包的功能，所以我们创建<code>Assetcompresser.php</code>文件，完成所需功能:</p>
+
+<figure class='code'><figcaption><span>Assetcompresser.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Friparia\Assetcompresser</span><span class="p">;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Assetcompresser</span><span class="p">{</span>
+</span><span class='line'>    <span class="sd">/**</span>
+</span><span class='line'><span class="sd">     * Minifies css files</span>
+</span><span class='line'><span class="sd">     * @param  string  $path  input css file</span>
+</span><span class='line'><span class="sd">     * @return string         compressed string</span>
+</span><span class='line'><span class="sd">     */</span>
+</span><span class='line'>    <span class="k">static</span> <span class="k">public</span> <span class="k">function</span> <span class="nf">minifycss</span><span class="p">(</span><span class="nv">$path</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$path</span><span class="p">)){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nv">$contents</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nv">$path</span><span class="p">)){</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nx">trim</span><span class="p">(</span><span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$search</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;/\/\*[\d\D]*?\*\/|</span><span class="se">\t</span><span class="s2">+/&quot;</span><span class="p">,</span> <span class="s2">&quot;/\s+/&quot;</span><span class="p">,</span> <span class="s2">&quot;/\}\s+/&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$replace</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$search</span><span class="p">,</span> <span class="nv">$replace</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$search</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">;\s/&quot;</span><span class="p">,</span> <span class="s2">&quot;/\s+\{\\s+/&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">:\s+</span><span class="se">\\</span><span class="s2">#/&quot;</span><span class="p">,</span> <span class="s2">&quot;/,\s+/i&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">:\s+</span><span class="se">\\</span><span class="s2">\&#39;/i&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">:\s+([0-9]+|[A-F]+)/i&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$replace</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">,</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;:#&quot;</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;:\&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;:$1&quot;</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">preg_replace</span><span class="p">(</span><span class="nv">$search</span><span class="p">,</span> <span class="nv">$replace</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="nv">$contents</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">);</span>
+</span><span class='line'>                <span class="k">return</span> <span class="nv">$contents</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>最后别忘了在ServiceProvider里注册我们的命令，打开<code>AssetcompresserServiceProvider.php</code>，在<code>register()</code>方法中添加:</p>
+
+<figure class='code'><figcaption><span>CompressCssCommand.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;command.compress.css&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">CompressCssCommand</span><span class="p">(</span><span class="nv">$app</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">commands</span><span class="p">(</span>
+</span><span class='line'>        <span class="s1">&#39;command.compress.css&#39;</span>
+</span><span class='line'>    <span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>以使得我们的命令能够正确的被执行，执行<code>php artisan compress:css</code>就可以得到我们压缩后的css文件。</p>
+
+<p>到此我们的不加参数的命令行的命令开发就完成了，在下一篇博客中我会把加参数的命令开发完成。并且利用空闲时间把这整个包完成~</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Laravel 插件开发入门]]></title>
+    <link href="http://blog.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough/"/>
+    <updated>2014-04-18T22:38:49+08:00</updated>
+    <id>http://blog.friparia.com/blog/2014/04/18/laravel-package-develop-walkthrough</id>
+    <content type="html"><![CDATA[<p>最近在开发几个Laravel的包，发现开发文档中的东西说的太少，就在网上搜了很久，发现没有能用的中文版说明，于是打算自己写一个了……
+看的比较不错的是这个<a href="https://github.com/orangehill/Laravel-Workbench-Walkthrough">Laravel Workbench Walkthrough</a>，这个介绍有一部分是从这上面看到的</p>
+
+<!--more-->
+
+
+<h1>准备</h1>
+
+<p>当然你得先有使用Laravel框架开发的基础了，然后就是插件的需要，Laravel是个很棒的框架，非常适合迅速快捷的开发，在不是特别庞大的系统面前我觉得非常容易而且好用，当然比较庞大的系统还没有做过，所以同样也是不了解。其次就是需要开发包的需求，有了包可以使我们的开发更加的快速，尤其是封装良好的Packages。而Laravel框架本身也提供了非常友好的包开发机制，使开发者们开发以及使用包都非常的容易，几个命令，一个包和自带的内容就非常容易的部署完成了。</p>
+
+<h1>创建</h1>
+
+<p>作为一个包，首先就是需要作者的信息了，所以我们先打开
+<code>app/config/workbench.php</code>
+进行自己的名字和Email的配置，这些信息会在下面我们执行生成命令的时候自动写入到<code>composer.json</code>的文件中。
+填写完自己的信息后我们就可以使用命令来自动生成一些文件，在根目录下执行下面的命令:
+<code>php artisan workbench vendor/package --resources</code>
+vendor是自己的厂商名或者组织或者个人的名字，package就是具体的一个包的名字，比如我就可以以<code>friparia/generator</code>来代表我生成一个叫做generator的包，这个包是friparia发布的。<code>--resources</code>这个参数是表示生成一系列资源文件夹，包括包内的controllers、migrations等等。详细内容可以到<a href="http://golaravel.com/docs/4.1/packages">文档</a>了解
+现在就可以看到<code>workbench/vendor/package</code>下面的文件结构和内容了，这表明我们已经创建好了自己的包，第一步完成了</p>
+
+<h1>设置</h1>
+
+<p>既然我们创建好了自己的包，自然我们就希望很容易的去使用到自己所创建的这个包，下面来谈一谈如何设置
+打开<code>app/config/app.php</code>添加一个自己的Service Provider(服务提供)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="s1">&#39;providers&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class='line'>    <span class="c1">//---- Other providers</span>
+</span><span class='line'>    <span class="s1">&#39;Vendor\Package\PackageServiceProvide&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="p">),</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这一步会在框架启动的时候去执行你的ServiceProvider去取得你的包中的内容，这样我们相当于注册了自己的服务
+然后我们就可以开始编写自己包中的内容了，打开workbench/vendor/package/src/Vendor/Package/Package.php，进行自己逻辑的编写，如下所示</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Vendor\Package</span><span class="p">;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Package</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">hello</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s2">&quot;Hello World!&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后将我们写好的类注册到IoC容器中，使得框架能够正确加载，打开workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php，在register()函数中添加以下内容</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">(){</span>
+</span><span class='line'>  <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="p">[</span><span class="s1">&#39;package&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">share</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="nv">$app</span><span class="p">){</span>
+</span><span class='line'>      <span class="k">return</span> <span class="k">new</span> <span class="nx">Package</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后我们就可以在任何地方使用我们创建的包了，比如一条路由</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nx">Route</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="nx">\Vendor\Package\Package</span><span class="o">::</span><span class="na">hello</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>访问这条路由我们就可以看到Hello World!了！</p>
+
+<h1>Facade生成</h1>
+
+<p>觉得每次要输那么长一串再得到自己的包是不是感觉不爽，要是直接能<code>Package::hello()</code>多好，这时候我们就可以用到设计模式中的外观模式了，有关设计模式我想结合Laravel框架中的为例子再以后的blog中说，我觉得现在自己掌握的还不是特别好。下面就让我们进行Facade的创建
+在<code>workbench/vendor/package/src/Vendor/Package</code>文件夹下创建一个<code>Facades</code>的文件夹
+在这个<code>Facades</code>的文件夹中我们创建一个叫做<code>Package.php</code>的文件，这个文件的具体内容如下</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">namespace</span> <span class="nx">Vendor\Package\Facades</span><span class="p">;</span>
+</span><span class='line'><span class="k">use</span> <span class="nx">Illuminate\Support\Facades\Facade</span><span class="p">;</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">Package</span> <span class="k">extends</span> <span class="nx">Facade</span><span class="p">{</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getFacadeAccessor</span><span class="p">(){</span> <span class="k">return</span> <span class="s1">&#39;package&#39;</span><span class="p">;}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后将写好的Facade注册到自己的包中，打开<code>workbench/vendor/package/src/Vendor/Package/PackageServiceProvider.php</code>，在register()函数中添加以下几行:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">app</span><span class="o">-&gt;</span><span class="na">booting</span><span class="p">(</span><span class="k">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="nv">$loader</span> <span class="o">=</span> <span class="nx">\Illuminate\Foundation\AliasLoader</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+</span><span class='line'>    <span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">alias</span><span class="p">(</span><span class="s1">&#39;Package&#39;</span><span class="p">,</span> <span class="s1">&#39;Vendor\Package\Facades\Package&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>或者你也可以直接写在<code>app/config/app.php</code>的alias数组中，我觉得其实写在Service Provider中会更好一点</p>
+
+<h1>测试</h1>
+
+<p>这时候我们就可以很容易的使用我们自己的包了，路由如下所示</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="nx">Route</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">echo</span> <span class="nx">Package</span><span class="o">::</span><span class="na">hello</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Tips</h1>
+
+<p>如果出现<code>Class Not Found</code>的错误，注释掉<code>app/config/app.php</code>中自行添加的一行，并且在项目目录下执行<code>php artisan dump-autoload</code>命令即可，别忘了再将刚才注释的那行给取消注释了。</p>
+
+<h1>完成</h1>
+
+<p>Ok,一个包就这样创建并使用了，通过包的开发方式，我们可以更容易的去复用自己的代码，减少自己的工作量。当然这才是包开发的基础，我会在下次写有关包命令开发的攻略~</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Vim总结]]></title>
+    <link href="http://blog.friparia.com/blog/2014/03/31/vimzong-jie/"/>
+    <updated>2014-03-31T13:54:35+08:00</updated>
+    <id>http://blog.friparia.com/blog/2014/03/31/vimzong-jie</id>
+    <content type="html"><![CDATA[<p>这两天在看vim，顺手总结了下不知道但是觉得很有用命令</p>
+
+<!--more-->
+
+
+<ul>
+<li><code>U</code> 行撤销，撤销所有在最近编辑的行上的操作</li>
+<li><code>ZZ</code> 保存并退出</li>
+<li><code>e</code> 下一个单词的词末</li>
+<li><code>ge</code> 移动到前一个单词的末尾</li>
+<li><code>W</code> 字串，包括连接符(E同理)</li>
+<li><code>0</code> 移动到一行的第一个字符</li>
+<li><code>F</code> 向左查找</li>
+<li><code>t</code> 查找至其前一个字符</li>
+<li><code>ctrl-v</code> 启动矩形可视模式</li>
+<li><code>`”</code> 跳转到上次离开这个文件时的位置</li>
+<li><code>`.</code> 最后一次修文件的位置</li>
+<li><code>.</code> 重复前一个修改命令</li>
+<li><code>ctrl-l</code> 重画整个屏幕</li>
+<li><code>gf</code> 查找文件中文件名，然后打开(必须在path中或者超链接)</li>
+<li><code>gv</code> 选择上次选过的文本
+
+<h4>寄存器</h4></li>
+<li><code>“fyas</code> 拷贝一个句子到f寄存器</li>
+</ul>
+
+
+<p><a href="https://github.com/friparia/myscripts/blob/master/.vimrc">我的vimrc</a></p>
+
+<h4>待整理</h4>
+
+<ul>
+<li>单词组成部分’iskeyword’</li>
+<li>文本组成对象 text-objects</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
