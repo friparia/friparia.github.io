@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Web,framework | Friparia Blog]]></title>
   <link href="http://blog.friparia.com/blog/categories/web-framework/atom.xml" rel="self"/>
   <link href="http://blog.friparia.com/"/>
-  <updated>2015-05-27T16:52:21+08:00</updated>
+  <updated>2015-05-27T16:54:22+08:00</updated>
   <id>http://blog.friparia.com/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -69,28 +69,28 @@ permissionCheck(USER);
 <td align="left">check score     </td>
 <td align="left">yes </td>
 <td align="left">yes </td>
-<td align="left">yes|</td>
+<td align="left">yes</td>
 </tr>
 <tr>
 <td></td>
 <td align="left">change score    </td>
 <td align="left">no  </td>
 <td align="left">yes </td>
-<td align="left">no|</td>
+<td align="left">no</td>
 </tr>
 <tr>
 <td></td>
 <td align="left">change dorm     </td>
 <td align="left">no  </td>
 <td align="left">no  </td>
-<td align="left">no|</td>
+<td align="left">no</td>
 </tr>
 <tr>
 <td></td>
 <td align="left">change class    </td>
 <td align="left">no  </td>
 <td align="left">yes </td>
-<td align="left">yes|</td>
+<td align="left">yes</td>
 </tr>
 </tbody>
 </table>
