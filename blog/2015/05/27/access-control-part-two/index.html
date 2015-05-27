@@ -175,14 +175,43 @@
 
 <p>基于角色的访问控制的基本思想是将访问的权限分给不同的用户，访问控制基于角色的不同来进行控制，例如，一个学生信息管理系统，有学生、教师、教工等角色。这些角色的权限各不相同，我们实质上是维护一个访问控制表(ACL:Access Control List)来进行权限判定的。这张访问控制表在MVC架构下非常容易实现和使用，因为我们的具体的操作其实就是一个controller下的action，以角色为一个维度，操作为一个维度，便可以建立一张访问控制表，如下所示</p>
 
-<pre><code>            |学生|教师|辅导员
-</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">permission/role </th>
+<th align="left">学生</th>
+<th align="left">教师</th>
+<th align="left">辅导员</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">check score     </td>
+<td align="left">yes </td>
+<td align="left">yes </td>
+<td align="left">yes</td>
+</tr>
+<tr>
+<td align="left">change score    </td>
+<td align="left">no  </td>
+<td align="left">yes </td>
+<td align="left">no</td>
+</tr>
+<tr>
+<td align="left">change dorm     </td>
+<td align="left">no  </td>
+<td align="left">no  </td>
+<td align="left">no</td>
+</tr>
+<tr>
+<td align="left">change class    </td>
+<td align="left">no  </td>
+<td align="left">yes </td>
+<td align="left">yes</td>
+</tr>
+</tbody>
+</table>
 
-<p>&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;
-check score     |yes |yes |yes
-change score    |no  |yes |no
-change dorm     |no  |no  |no
-change class    |no  |yes |yes</p>
 
 <p>不同的角色拥有不同的权限，这张表的维护我们可以将其放在数据库或者其他什么地方，而我们在具体实现的时候可以通过以下方式调用来检查权限：</p>
 
