@@ -160,6 +160,36 @@
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nx">permissionCheck</span><span class="p">(</span><span class="nx">USER</span><span class="p">);</span>
+</span><span class='line'><span class="c1">//do something</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这样设计的好处就是大大的简化了权限检查，以较少的代码来完成这样一件事情，就我所知，使用这用方法的项目主要是nexusphp，是各个bt、pt站的一个解决方案。</p>
+
+<p>简单是简单，但是这样操作缺乏灵活性和扩展性，比如我们要求，用户可以访问到的页面管理员不能访问得到(部分用户的隐私信息等)，基于层级的权限控制就没有办法来完成这样的需求了。而且这种情况不太适合当前所流行的MVC的架构，这时候我们就需要引入基于角色的权限访问控制。</p>
+
+<h1>基于角色的权限控制</h1>
+
+<p>基于角色的访问控制的基本思想是将访问的权限分给不同的用户，访问控制基于角色的不同来进行控制，例如，一个学生信息管理系统，有学生、教师、教工等角色。这些角色的权限各不相同，我们实质上是维护一个访问控制表(ACL:Access Control List)来进行权限判定的。这张访问控制表在MVC架构下非常容易实现和使用，因为我们的具体的操作其实就是一个controller下的action，以角色为一个维度，操作为一个维度，便可以建立一张访问控制表，如下所示</p>
+
+<pre><code>            |学生|教师|辅导员
+</code></pre>
+
+<p>&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;|&mdash;&mdash;
+check score     |yes |yes |yes
+change score    |no  |yes |no
+change dorm     |no  |no  |no
+change class    |no  |yes |yes</p>
+
+<p>不同的角色拥有不同的权限，这张表的维护我们可以将其放在数据库或者其他什么地方，而我们在具体实现的时候可以通过以下方式调用来检查权限：</p>
+
+<figure class='code'><figcaption><span>SomeController.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
@@ -169,55 +199,21 @@
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
 <span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
 </pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'><span class="nx">permissionCheck</span><span class="p">(</span><span class="nx">USER</span><span class="p">);</span>
-</span><span class='line'><span class="c1">//do something</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">SomeController</span><span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">checkPermission</span><span class="p">(</span><span class="nv">$controller</span><span class="p">,</span> <span class="nv">$action</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">public</span> <span class="k">function</span> <span class="nf">action1</span><span class="p">(){</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">//other codes</span>
+</span><span class='line'><span class="p">}</span>
 </span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
-</span><span class='line'>
-</span><span class='line'><span class="x">这样设计的好处就是大大的简化了权限检查，以较少的代码来完成这样一件事情，就我所知，使用这用方法的项目主要是nexusphp，是各个bt、pt站的一个解决方案。</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">简单是简单，但是这样操作缺乏灵活性和扩展性，比如我们要求，用户可以访问到的页面管理员不能访问得到(部分用户的隐私信息等)，基于层级的权限控制就没有办法来完成这样的需求了。而且这种情况不太适合当前所流行的MVC的架构，这时候我们就需要引入基于角色的权限访问控制。</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">#基于角色的权限控制</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">基于角色的访问控制的基本思想是将访问的权限分给不同的用户，访问控制基于角色的不同来进行控制，例如，一个学生信息管理系统，有学生、教师、教工等角色。这些角色的权限各不相同，我们实质上是维护一个访问控制表(ACL:Access Control List)来进行权限判定的。这张访问控制表在MVC架构下非常容易实现和使用，因为我们的具体的操作其实就是一个controller下的action，以角色为一个维度，操作为一个维度，便可以建立一张访问控制表，如下所示</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">                |学生|教师|辅导员</span>
-</span><span class='line'><span class="x">----------------|----|----|----</span>
-</span><span class='line'><span class="x">check score     |yes |yes |yes</span>
-</span><span class='line'><span class="x">change score    |no  |yes |no</span>
-</span><span class='line'><span class="x">change dorm     |no  |no  |no</span>
-</span><span class='line'><span class="x">change class    |no  |yes |yes</span>
-</span><span class='line'>
-</span><span class='line'><span class="x">不同的角色拥有不同的权限，这张表的维护我们可以将其放在数据库或者其他什么地方，而我们在具体实现的时候可以通过以下方式调用来检查权限：</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>php SomeController.php
-&lt;?php
-class SomeController{</p>
-
-<pre><code>public function __construct(){
-    checkPermission($controller, $action);
-}
-
-public function action1(){
-}
-
-//other codes
-</code></pre>
-
-<p>}
-?>
-&#8220;`</p>
 
 <p>我们还是可以将其封装成基类让我们的具体实现Controller继承从而复用我们的代码。</p>
 

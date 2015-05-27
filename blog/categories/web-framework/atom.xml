@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Web,framework | Friparia Blog]]></title>
   <link href="http://blog.friparia.com/blog/categories/web-framework/atom.xml" rel="self"/>
   <link href="http://blog.friparia.com/"/>
-  <updated>2015-05-27T16:41:51+08:00</updated>
+  <updated>2015-05-27T16:43:42+08:00</updated>
   <id>http://blog.friparia.com/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -38,11 +38,12 @@ define("GUEST", 1);
 
 <p>然后在每个页面或者操作之前，进行一次权限检查，只需要调用一次permissionCheck()函数，就检验当前的用户是不是具有用户以上的等级的权限，如果没有的话就会跳转到未授权页面。</p>
 
-<p>```php SomePage.php
+<p><code>php SomePage.php
 &lt;?php
 permissionCheck(USER);
 //do something
-?></p>
+?&gt;
+</code></p>
 
 <p>这样设计的好处就是大大的简化了权限检查，以较少的代码来完成这样一件事情，就我所知，使用这用方法的项目主要是nexusphp，是各个bt、pt站的一个解决方案。</p>
 
