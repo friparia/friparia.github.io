@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://blog.friparia.com/atom.xml" rel="self"/>
   <link href="http://blog.friparia.com/"/>
-  <updated>2015-03-24T15:45:08+08:00</updated>
+  <updated>2015-05-27T16:41:51+08:00</updated>
   <id>http://blog.friparia.com/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[信息系统中的权限控制(二)：基于层级的权限控制]]></title>
+    <link href="http://blog.friparia.com/blog/2015/05/27/access-control-part-two/"/>
+    <updated>2015-05-27T15:46:43+08:00</updated>
+    <id>http://blog.friparia.com/blog/2015/05/27/access-control-part-two</id>
+    <content type="html"><![CDATA[<p>上文中我们讲了一种最简单地权限控制方法——基于业务逻辑，也就是具体问题具体分析的一种方法。这篇文章主要介绍基于层级和基于角色的权限控制方法。</p>
+
+<!--more-->
+
+
+<h1>基于层级的权限控制</h1>
+
+<p>打个比方，当我们的系统中有超级管理员，普通管理员，普通用户，游客这些角色的时候，我们不能再使用业务逻辑来判断了，不然可能会产生大量重复无用代码。而我们会发现，这几种角色是存在着明显的层级关系，游客的可以进行的操作最少，超级管理员可以进行的操作最多，这时候我们就可以预定义他们的等级，然后再在具体的业务模块进行判定。</p>
+
+<figure class='code'><figcaption><span>config.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;SUPERADMIN&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;ADMIN&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;USER&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;GUEST&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>然后在每个页面或者操作之前，进行一次权限检查，只需要调用一次permissionCheck()函数，就检验当前的用户是不是具有用户以上的等级的权限，如果没有的话就会跳转到未授权页面。</p>
+
+<figure class='code'><figcaption><span>SomePage.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nx">permissionCheck</span><span class="p">(</span><span class="nx">USER</span><span class="p">);</span>
+</span><span class='line'><span class="c1">//do something</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'>
+</span><span class='line'><span class="x">这样设计的好处就是大大的简化了权限检查，以较少的代码来完成这样一件事情，就我所知，使用这用方法的项目主要是nexusphp，是各个bt、pt站的一个解决方案。</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">简单是简单，但是这样操作缺乏灵活性和扩展性，比如我们要求，用户可以访问到的页面管理员不能访问得到(部分用户的隐私信息等)，基于层级的权限控制就没有办法来完成这样的需求了。而且这种情况不太适合当前所流行的MVC的架构，这时候我们就需要引入基于角色的权限访问控制。</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">#基于角色的权限控制</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">基于角色的访问控制的基本思想是将访问的权限分给不同的用户，访问控制基于角色的不同来进行控制，例如，一个学生信息管理系统，有学生、教师、教工等角色。这些角色的权限各不相同，我们实质上是维护一个访问控制表(ACL:Access Control List)来进行权限判定的。这张访问控制表在MVC架构下非常容易实现和使用，因为我们的具体的操作其实就是一个controller下的action，以角色为一个维度，操作为一个维度，便可以建立一张访问控制表，如下所示</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">                |学生|教师|辅导员</span>
+</span><span class='line'><span class="x">----------------|----|----|----</span>
+</span><span class='line'><span class="x">check score     |yes |yes |yes</span>
+</span><span class='line'><span class="x">change score    |no  |yes |no</span>
+</span><span class='line'><span class="x">change dorm     |no  |no  |no</span>
+</span><span class='line'><span class="x">change class    |no  |yes |yes</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">不同的角色拥有不同的权限，这张表的维护我们可以将其放在数据库或者其他什么地方，而我们在具体实现的时候可以通过以下方式调用来检查权限：</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>php SomeController.php
+&lt;?php
+class SomeController{</p>
+
+<pre><code>public function __construct(){
+    checkPermission($controller, $action);
+}
+
+public function action1(){
+}
+
+//other codes
+</code></pre>
+
+<p>}
+?>
+&#8220;`</p>
+
+<p>我们还是可以将其封装成基类让我们的具体实现Controller继承从而复用我们的代码。</p>
+
+<p>这样当我们有一个辅导员要改成绩的需求的话，只需要在数据库里将辅导员的change score权限改为yes即可。基于角色的权限管理方式具有灵活性、方便性和安全性的特点，而且现在使用的也非常广泛。但是基于角色的权限管理中，角色与客体并无直接的联系，即没有办法进行横向权限的判定，从而会存在一些越权的BUG，比如数学老师能够修改语文成绩这样的问题，我们将会在下一篇中提出一种基于资源的权限控制方式，以这种方式来做横向权限的判定。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[信息系统中的权限控制(一)：基于业务逻辑]]></title>
@@ -143,8 +243,8 @@
 <p>有任何问题可以通过以下方式联系我:</p>
 
 <ul>
-<li><p>邮箱:<a href="&#x6d;&#97;&#x69;&#x6c;&#x74;&#x6f;&#58;&#x66;&#x72;&#105;&#112;&#97;&#x72;&#105;&#97;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#46;&#99;&#111;&#109;">&#x66;&#114;&#x69;&#112;&#97;&#x72;&#x69;&#97;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#x6d;</a></p></li>
-<li><p>irc:<a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#x66;&#x72;&#x69;&#x70;&#97;&#x72;&#105;&#97;&#64;&#105;&#x72;&#99;&#x2e;&#x66;&#114;&#x65;&#x65;&#110;&#x6f;&#x64;&#101;&#46;&#x6e;&#x65;&#116;">&#x66;&#x72;&#105;&#112;&#97;&#x72;&#x69;&#x61;&#64;&#105;&#x72;&#x63;&#46;&#102;&#x72;&#x65;&#x65;&#x6e;&#111;&#100;&#101;&#46;&#110;&#101;&#x74;</a></p></li>
+<li><p>邮箱:<a href="&#109;&#97;&#105;&#x6c;&#116;&#111;&#58;&#x66;&#114;&#105;&#112;&#x61;&#x72;&#105;&#x61;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#109;">&#x66;&#x72;&#x69;&#112;&#97;&#114;&#x69;&#x61;&#64;&#103;&#x6d;&#97;&#105;&#108;&#46;&#99;&#x6f;&#x6d;</a></p></li>
+<li><p>irc:<a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#111;&#x3a;&#x66;&#x72;&#105;&#112;&#x61;&#114;&#x69;&#97;&#64;&#105;&#114;&#99;&#x2e;&#x66;&#x72;&#x65;&#x65;&#x6e;&#x6f;&#x64;&#101;&#x2e;&#110;&#x65;&#116;">&#x66;&#114;&#x69;&#x70;&#97;&#114;&#105;&#x61;&#64;&#x69;&#114;&#x63;&#46;&#102;&#x72;&#101;&#x65;&#x6e;&#x6f;&#100;&#101;&#46;&#x6e;&#101;&#x74;</a></p></li>
 </ul>
 
 ]]></content>

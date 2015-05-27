@@ -5,7 +5,7 @@
 <!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
   <head>
     <meta charset="utf-8">
-    <title>信息系统中的权限控制(一)：基于业务逻辑 - Friparia Blog</title>
+    <title>信息系统中的权限控制(二)：基于层级的权限控制 - Friparia Blog</title>
     <meta name="author" content="Friparia">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta property="wb:webmaster" content="160e11a48cc9eefc" />
@@ -37,7 +37,7 @@
     <link href="/assets/css/custom.css" rel="stylesheet" type="text/css"/>
     <!-- END THEME STYLES -->
     
-    <link rel="canonical" href="http://blog.friparia.com/blog/2015/03/24/access-control-part-one">
+    <link rel="canonical" href="http://blog.friparia.com/blog/2015/05/27/access-control-part-two">
     <link href="/favicon.png" rel="icon">
 
     <link href="/atom.xml" rel="alternate" title="Friparia Blog" type="application/atom+xml">
@@ -104,7 +104,7 @@
 <article class="hentry" role="article">
   
     
-    <h1>信息系统中的权限控制(一)：基于业务逻辑</h1>
+    <h1>信息系统中的权限控制(二)：基于层级的权限控制</h1>
     
     
       <p class="meta">
@@ -120,7 +120,7 @@
   
 
 
-<time datetime="2015-03-24T18:51:04+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2015</time>
+<time datetime="2015-05-27T15:46:43+08:00" pubdate data-updated="true">May 27<span>th</span>, 2015</time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://blog.friparia.com">Comments</a>
@@ -130,33 +130,33 @@
 
 
 
-<div><p>互联网不断地发展，为信息的共享提供了一个更加完善的解决方案，提供了一个信息更加对等的环境。但是，我们不能无条件的扩散信息，一些敏感信息不能够对非授权用户提供，所以我们就需要对我们的信息系统进行访问控制，来保证企业等在信息系统中储存和处理的信息的安全。最近在对信息系统做一套访问控制，结合以前的开发，大概总结了一下几种权限控制的方法：基于业务逻辑、基于层级、基于角色、基于资源等权限控制方法，我们由最简单的基于业务逻辑的入手，对他们进行一个详细的讨论。</p>
+<div><p>上文中我们讲了一种最简单地权限控制方法——基于业务逻辑，也就是具体问题具体分析的一种方法。这篇文章主要介绍基于层级和基于角色的权限控制方法。</p>
 
 <!--more-->
 
 
-<h1>基于业务逻辑的权限控制</h1>
+<h1>基于层级的权限控制</h1>
 
-<p>基于业务逻辑的权限控制其实是最容易理解的，就是哪里需要权限控制就去哪里具体实现我自己的代码，比如我们对某个页面，某个操作进行控制，只能某些人进行访问，只能在逻辑代码前再贴上自己的权限控制逻辑</p>
+<p>打个比方，当我们的系统中有超级管理员，普通管理员，普通用户，游客这些角色的时候，我们不能再使用业务逻辑来判断了，不然可能会产生大量重复无用代码。而我们会发现，这几种角色是存在着明显的层级关系，游客的可以进行的操作最少，超级管理员可以进行的操作最多，这时候我们就可以预定义他们的等级，然后再在具体的业务模块进行判定。</p>
 
-<figure class='code'><figcaption><span>SomePage.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>config.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">checkAuth</span><span class="p">()){</span>
-</span><span class='line'>  <span class="k">die</span><span class="p">(</span><span class="mi">403</span><span class="p">);</span><span class="c1">//somebody that can not visit</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="c1">//do something </span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;SUPERADMIN&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;ADMIN&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;USER&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</span><span class='line'><span class="nb">define</span><span class="p">(</span><span class="s2">&quot;GUEST&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>或者在具体某个地方再进行判断</p>
+<p>然后在每个页面或者操作之前，进行一次权限检查，只需要调用一次permissionCheck()函数，就检验当前的用户是不是具有用户以上的等级的权限，如果没有的话就会跳转到未授权页面。</p>
 
-<figure class='code'><figcaption><span>SomeOtherPage.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>SomePage.php</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -171,27 +171,57 @@
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="c1">//some classic php operation</span>
-</span><span class='line'><span class="nv">$action</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;action&#39;</span><span class="p">];</span>
-</span><span class='line'><span class="k">switch</span><span class="p">(</span><span class="nv">$action</span><span class="p">){</span>
-</span><span class='line'>  <span class="k">case</span> <span class="s1">&#39;action_one&#39;</span><span class="o">:</span>
-</span><span class='line'>    <span class="c1">//some thing</span>
-</span><span class='line'>    <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">case</span> <span class="s1">&#39;action_two&#39;</span><span class="o">:</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">someCheck</span><span class="p">()){</span>
-</span><span class='line'>      <span class="k">die</span><span class="p">(</span><span class="mi">403</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>    <span class="c1">//access controlled thing</span>
-</span><span class='line'>    <span class="k">break</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">default</span><span class="o">:</span>
-</span><span class='line'>    <span class="c1">//other thing</span>
-</span><span class='line'><span class="p">}</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="nx">permissionCheck</span><span class="p">(</span><span class="nx">USER</span><span class="p">);</span>
+</span><span class='line'><span class="c1">//do something</span>
+</span><span class='line'><span class="cp">?&gt;</span><span class="x"></span>
+</span><span class='line'>
+</span><span class='line'><span class="x">这样设计的好处就是大大的简化了权限检查，以较少的代码来完成这样一件事情，就我所知，使用这用方法的项目主要是nexusphp，是各个bt、pt站的一个解决方案。</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">简单是简单，但是这样操作缺乏灵活性和扩展性，比如我们要求，用户可以访问到的页面管理员不能访问得到(部分用户的隐私信息等)，基于层级的权限控制就没有办法来完成这样的需求了。而且这种情况不太适合当前所流行的MVC的架构，这时候我们就需要引入基于角色的权限访问控制。</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">#基于角色的权限控制</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">基于角色的访问控制的基本思想是将访问的权限分给不同的用户，访问控制基于角色的不同来进行控制，例如，一个学生信息管理系统，有学生、教师、教工等角色。这些角色的权限各不相同，我们实质上是维护一个访问控制表(ACL:Access Control List)来进行权限判定的。这张访问控制表在MVC架构下非常容易实现和使用，因为我们的具体的操作其实就是一个controller下的action，以角色为一个维度，操作为一个维度，便可以建立一张访问控制表，如下所示</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">                |学生|教师|辅导员</span>
+</span><span class='line'><span class="x">----------------|----|----|----</span>
+</span><span class='line'><span class="x">check score     |yes |yes |yes</span>
+</span><span class='line'><span class="x">change score    |no  |yes |no</span>
+</span><span class='line'><span class="x">change dorm     |no  |no  |no</span>
+</span><span class='line'><span class="x">change class    |no  |yes |yes</span>
+</span><span class='line'>
+</span><span class='line'><span class="x">不同的角色拥有不同的权限，这张表的维护我们可以将其放在数据库或者其他什么地方，而我们在具体实现的时候可以通过以下方式调用来检查权限：</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>如果我们的信息系统比较容易，用户的分类也比较单一（比如就只有管理员和用户），我们就可以使用这种简单粗暴的方法进行权限控制，在这种时候，我们的基本上是比较低的，不管是需要写的代码还是需要思考的时间。但是，这个在软件工程中有一种非常明显的缺陷，就是几乎没有扩展性和维护性，要想对某个页面进行权限控制，基本上靠复制粘贴。</p>
+<p>php SomeController.php
+&lt;?php
+class SomeController{</p>
 
-<p>当我们的信息系统变得庞大起来时，我们的技术部门的人员不仅仅是两三个人的时候，我们就需要更加灵活、方便的权限控制方式，这时候基于业务逻辑的权限控制就显现出了其局限性，我们如果继续采用基于业务逻辑的权限控制的话，那么我们的代码就会变得异常庞大，变得不易维护，而且也不利于多人开发，我们就需要一个更加优秀的模型来替代这种权限检查的方式，这就是我们下次将会提到的基于层级的权限控制。</p>
+<pre><code>public function __construct(){
+    checkPermission($controller, $action);
+}
+
+public function action1(){
+}
+
+//other codes
+</code></pre>
+
+<p>}
+?>
+&#8220;`</p>
+
+<p>我们还是可以将其封装成基类让我们的具体实现Controller继承从而复用我们的代码。</p>
+
+<p>这样当我们有一个辅导员要改成绩的需求的话，只需要在数据库里将辅导员的change score权限改为yes即可。基于角色的权限管理方式具有灵活性、方便性和安全性的特点，而且现在使用的也非常广泛。但是基于角色的权限管理中，角色与客体并无直接的联系，即没有办法进行横向权限的判定，从而会存在一些越权的BUG，比如数学老师能够修改语文成绩这样的问题，我们将会在下一篇中提出一种基于资源的权限控制方式，以这种方式来做横向权限的判定。</p>
 </div>
 
 
@@ -218,7 +248,7 @@
   
 
 
-<time datetime="2015-03-24T18:51:04+08:00" pubdate data-updated="true">Mar 24<span>th</span>, 2015</time>
+<time datetime="2015-05-27T15:46:43+08:00" pubdate data-updated="true">May 27<span>th</span>, 2015</time>
       </li>
       <li><i class="fa fa-tags"></i>
       
@@ -229,7 +259,7 @@
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.friparia.com/blog/2015/03/24/access-control-part-one/" data-via="friparia" data-counturl="http://blog.friparia.com/blog/2015/03/24/access-control-part-one/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.friparia.com/blog/2015/05/27/access-control-part-two/" data-via="friparia" data-counturl="http://blog.friparia.com/blog/2015/05/27/access-control-part-two/" >Tweet</a>
   
   
   
@@ -240,10 +270,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2014/08/25/what-happened-after-typing-url-in-your-browser/" title="Previous Post: 你在浏览器里面输入网址后都发生了什么">&laquo; 你在浏览器里面输入网址后都发生了什么</a>
+        <a class="basic-alignment left" href="/blog/2015/03/24/access-control-part-one/" title="Previous Post: 信息系统中的权限控制(一)：基于业务逻辑">&laquo; 信息系统中的权限控制(一)：基于业务逻辑</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2015/05/27/access-control-part-two/" title="Next Post: 信息系统中的权限控制(二)：基于层级的权限控制">信息系统中的权限控制(二)：基于层级的权限控制 &raquo;</a>
       
     </p>
   </footer>
@@ -352,8 +380,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.friparia.com/blog/2015/03/24/access-control-part-one/';
-        var disqus_url = 'http://blog.friparia.com/blog/2015/03/24/access-control-part-one/';
+        var disqus_identifier = 'http://blog.friparia.com/blog/2015/05/27/access-control-part-two/';
+        var disqus_url = 'http://blog.friparia.com/blog/2015/05/27/access-control-part-two/';
         var disqus_script = 'embed.js';
       
     (function () {
