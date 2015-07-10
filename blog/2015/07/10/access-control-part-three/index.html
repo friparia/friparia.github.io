@@ -1,0 +1,424 @@
+
+<!DOCTYPE html xmlns:wb=“http://open.weibo.com/wb”>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <title>信息系统中的权限控制(三)：基于资源的权限控制 - Friparia Blog</title>
+    <meta name="author" content="Friparia">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta property="wb:webmaster" content="160e11a48cc9eefc" />
+    <meta name="baidu-site-verification" content="9i4bBmAjIu" />
+
+    
+    
+    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->          
+    <link href="/assets/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/plugins/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+    <!-- END GLOBAL MANDATORY STYLES -->
+
+    <!-- BEGIN PAGE LEVEL PLUGIN STYLES --> 
+    <link href="/assets/plugins/fancybox/source/jquery.fancybox.css" rel="stylesheet" />              
+    <!-- END PAGE LEVEL PLUGIN STYLES -->
+
+    <!-- BEGIN THEME STYLES --> 
+    <link href="/assets/css/style-metronic.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/css/style-responsive.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/css/themes/blue.css" rel="stylesheet" type="text/css" id="style_color"/>
+    <link href="/assets/css/custom.css" rel="stylesheet" type="text/css"/>
+    <!-- END THEME STYLES -->
+    
+    <link rel="canonical" href="http://blog.friparia.com/blog/2015/07/10/access-control-part-three">
+    <link href="/favicon.png" rel="icon">
+
+    <link href="/atom.xml" rel="alternate" title="Friparia Blog" type="application/atom+xml">
+    <script src="/javascripts/modernizr-2.0.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+    <script src="/javascripts/octopress.js" type="text/javascript"></script>
+    <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+    
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-50180020-1', 'blog.friparia.com');
+  ga('send', 'pageview');
+
+</script>
+
+
+
+
+    <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?153661daa13860ef76b15b234338daa5";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+
+  </head>
+
+
+<body   >
+  <header style="text-align:left;border-bottom:1px solid #ddd;position:relative;padding:10px 0; color #fff;background:#020031;"><div class="container container-narror" style="color:#fff;position:relative;">
+  <h1>Friparia Blog</h1>
+  
+    <p style="margin-bottom:10px;font-size:16px;line-height:1.25;color:#fff;">Do more</p>
+  
+</div>
+
+</header>
+
+  <div class="header navbar navbar-default"><div class="container">
+  <div class="navbar-collapse collapse">
+    <ul class="nav navbar-nav">
+      <li><a href="/">Blog</a></li>
+      <li><a href="/blog/archives">Archives</a></li>
+    </ul>
+  </div>
+</div>
+
+</div>
+
+  <div class="container min-height">
+    <div class="row">
+      <div class="col-md-9 blog-item margin-bottom-40">
+<article class="hentry" role="article">
+  
+    
+    <h1>信息系统中的权限控制(三)：基于资源的权限控制</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-10T13:37:46+08:00" pubdate data-updated="true">Jul 10<span>th</span>, 2015</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://blog.friparia.com">Comments</a>
+        
+      </p>
+    
+
+
+
+<div><p>前两篇文章介绍了基于用户的权限控制，这种权限的控制是将用户进行划分，对系统中的操作进行一定的权限控制。但是在日常应用中，我们可能遇到这样一种场景：不同的用户分管不同的系统资源，比如Linux中的文件系统、比如淘宝店铺中的商品只能归所拥有的店主管理。在这种情形下就无法针对用户进行权限控制，而是应当具体到每个实体资源上去。</p>
+
+<!--more-->
+
+
+<h1>基于资源的权限控制</h1>
+
+<p>文章中对基于用户的权限控制的具体实现涉及到的比较多，而这篇可能就是提出一种思路或者想法，并没有一种特别好的实现方式。尤其是在Web应用下具体的某个资源非常难以精确抽象，不像Linux系统中我们可以很容易的抽象出目录和文件这两个资源，并进行权限控制)。</p>
+
+<p>因为Web应用可以做为资源的实体会非常多，而对资源的控制要求又比较强。当然，最简单的就是把他当做产品的具体业务逻辑，根据具体的情形书写具体的代码，这个方法如果管理比较复杂的权限控制的话就会产生大量烦杂的代码，对整个系统不很友好。</p>
+
+<p>如果在系统中使用了ORM，并且运用了一定的框架，那么就可以将具体的资源抽象到每个Model上面去，然后在Model的基类来完成具体的权限控制代码。一般情形是对查找出来的结果集进行过滤，然后将过滤后的结果集返回。或者在查询的时候添加一定的条件。下面给一个phalcon框架的filter例子:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='php'><span class='line'><span class="o">&lt;?</span><span class="nx">php</span>
+</span><span class='line'><span class="k">public</span> <span class="k">function</span> <span class="nf">afterFetch</span><span class="p">(){</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">Auth</span><span class="o">::</span><span class="na">canOperate</span><span class="p">(</span><span class="nb">get_called_class</span><span class="p">(),</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">)){</span>
+</span><span class='line'>        <span class="k">die</span><span class="p">(</span><span class="s2">&quot;你没有权限操作该对象!&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$parameters</span> <span class="o">=</span> <span class="k">null</span><span class="p">){</span>
+</span><span class='line'>    <span class="nv">$where</span> <span class="o">=</span> <span class="nx">Auth</span><span class="o">::</span><span class="na">resourceWhere</span><span class="p">(</span><span class="nb">get_called_class</span><span class="p">());</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$where</span><span class="p">){</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">)){</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="p">])){</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">){</span>
+</span><span class='line'>                <span class="nv">$parameters</span><span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$where</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="nv">$parameters</span><span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="p">]</span> <span class="o">.=</span> <span class="s2">&quot; and &quot;</span><span class="o">.</span><span class="nv">$where</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">){</span>
+</span><span class='line'>                <span class="nv">$parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$where</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>                <span class="nv">$parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">.=</span> <span class="s2">&quot; and &quot;</span><span class="o">.</span><span class="nv">$where</span><span class="p">;</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="nv">$parameters</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">){</span>
+</span><span class='line'>            <span class="nv">$parameters</span> <span class="o">=</span> <span class="nv">$where</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+</span><span class='line'>            <span class="nv">$parameters</span> <span class="o">.=</span> <span class="s2">&quot; and &quot;</span><span class="o">.</span><span class="nv">$where</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">find</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>如果没有使用ORM，只是用纯SQL语句取结果集的话，可能就需要针对具体的SQL进行拼接，拼接出权限控制后的SQL语句。</p>
+
+<p>不管什么样的方式，基于资源的权限控制都不是一件很好处理的事情，尤其是当需求不断的叠加时，会导致权限控制更加复杂，更加麻烦。</p>
+
+<h1>总结</h1>
+
+<p>只要有信息的地方，就会有权限控制，权限控制也是安全中的一项非常重要的一环，因为权限而导致的漏洞数不胜数，而且每个漏洞的危害都巨大无比，这里有个微信的资源控制的<a href="http://www.wooyun.org/bugs/wooyun-2010-090898">漏洞</a>，赤裸裸的抢钱啊。权限控制说起来容易，但是做起来，如何去设计，如何去兼容到整个系统中，如何将对其他模块的影响降到最低，是一件非常棘手的事情。希望我的这几篇博客给大家带来一点有关权限控制的思路。</p>
+
+<h1>P.S.</h1>
+
+<p>有关权限的东西也写的差不多了，现在做的系统的权限控制的地方也很稳定了(除了基于资源的权限)，刚开始觉得自己还有挺多东西要说的，写的时候才感觉到捉襟见肘，还是要多写写多练练啊。。</p>
+</div>
+
+
+
+  <footer>
+    <ul class="blog-info">
+      <li><i class="fa fa-user"></i>
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Friparia</span></span>
+
+      </li>
+      <li><i class="fa fa-calendar"></i>
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-07-10T13:37:46+08:00" pubdate data-updated="true">Jul 10<span>th</span>, 2015</time>
+      </li>
+      <li><i class="fa fa-tags"></i>
+      
+
+
+      </li>
+    </ul>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.friparia.com/blog/2015/07/10/access-control-part-three/" data-via="friparia" data-counturl="http://blog.friparia.com/blog/2015/07/10/access-control-part-three/" >Tweet</a>
+  
+  
+  
+  <script src="http://tjs.sjs.sinajs.cn/open/api/js/wb.js" type="text/javascript" charset="utf-8"></script>
+  <wb:share-button addition="number" type="button" ralateUid="2758456010"></wb:share-button>
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/05/27/access-control-part-two/" title="Previous Post: 信息系统中的权限控制(二)：基于层级的权限控制">&laquo; 信息系统中的权限控制(二)：基于层级的权限控制</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<div class="col-md-3 col-sm-3 blog-sidebar">
+  
+    <section>
+  <h2>Recent Posts</h2>
+  <ul class="nav sidebar-categories margin-bottom-40" id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/10/access-control-part-three/">信息系统中的权限控制(三)：基于资源的权限控制</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/27/access-control-part-two/">信息系统中的权限控制(二)：基于层级的权限控制</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/03/24/access-control-part-one/">信息系统中的权限控制(一)：基于业务逻辑</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/25/what-happened-after-typing-url-in-your-browser/">你在浏览器里面输入网址后都发生了什么</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/06/16/laravel-command-with-option-chs/">Laravel 带参数的命令行开发</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h2>GitHub Repos</h2>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'friparia',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</div>
+
+
+
+
+    </div>
+  </div>
+
+  <footer role="contentinfo"><div class="copyright">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <p>
+        <span class="margin-right-10">2015 - Friparia ALL Rights Reserved.</span> 
+        </p>
+      </div>
+      <div class="col-md-4">
+        <ul class="social-footer">
+          <li><a href="https://twitter.com/friparia"><i class="fa fa-twitter"></i></a></li>
+          <li><a href="https://github.com/friparia"><i class="fa fa-github"></i></a></li>
+        </ul>                
+      </div>
+    </div>
+  </div>
+</div>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'friparia';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.friparia.com/blog/2015/07/10/access-control-part-three/';
+        var disqus_url = 'http://blog.friparia.com/blog/2015/07/10/access-control-part-three/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+<script src="/assets/js/jquery-1.8.3.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+
+</body>
+</html>
