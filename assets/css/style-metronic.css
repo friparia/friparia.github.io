@@ -1368,3 +1368,7 @@ Bootstrap Panel
      -moz-box-shadow: none !important;
           box-shadow: none !important;
 }
+p {
+  font-size: 14px;
+  line-height: 22px;
+}
