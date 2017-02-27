@@ -4,7 +4,7 @@
   <title><![CDATA[Friparia Blog]]></title>
   <link href="http://blog.friparia.com/atom.xml" rel="self"/>
   <link href="http://blog.friparia.com/"/>
-  <updated>2016-01-21T16:50:33+08:00</updated>
+  <updated>2017-02-27T17:20:37+08:00</updated>
   <id>http://blog.friparia.com/</id>
   <author>
     <name><![CDATA[Friparia]]></name>
@@ -14,30 +14,195 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Nginx高级编程：在模块中使用共享内存]]></title>
+    <link href="http://blog.friparia.com/blog/2017/02/27/using-shared-memory-in-nginx/"/>
+    <updated>2017-02-27T10:02:23+08:00</updated>
+    <id>http://blog.friparia.com/blog/2017/02/27/using-shared-memory-in-nginx</id>
+    <content type="html"><![CDATA[<p>Nginx是由多个worker进程运行的，所以这些进程之间可以通过共享内存进行通信或完成一些进程间的工作，例如将用户session存储至nginx的内存中以提升运行效率等。Nginx提供了共享内存的API，由于其master-worker的模式，使得共享内存的使用和其与标准的内存分配略有不同。本文所使用的代码在这<a href="https://github.com/friparia/nginx-shared-memory-module">nginx-shared-memory-module</a>，测试开发环境为nginx 1.10.1。本文参考了<a href="http://www.evanmiller.org/nginx-modules-guide-advanced.html">Emiller&rsquo;s Advanced Topics In Nginx Module Development</a>。</p>
+
+<!--more-->
+
+
+<h1>创建并使用共享内存段(shared memory segment)</h1>
+
+<h2>注册共享内存的存储</h2>
+
+<p>和普通的模块开发类似，将所需的变量存储至配置的上下文中(可能会有更好的读取访问的位置)，结构体定义如下:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">typedef</span> <span class="k">struct</span><span class="p">{</span>
+</span><span class='line'>  <span class="n">ngx_shm_zone_t</span> <span class="o">*</span><span class="n">shm_zone</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span> <span class="n">ngx_http_hello_world_loc_conf_t</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>其中使用了<code>ngx_shm_zone_t</code>结构体，即一个共享内存区，其声明如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">struct</span> <span class="n">ngx_shm_zone_s</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">ngx_shm_t</span> <span class="n">shm</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">ngx_shm_zone_init_pt</span> <span class="n">init</span><span class="p">;</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="o">*</span><span class="n">tag</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>data</code>即共享内存中的自定义数据结构，初始化时使用。<code>shm</code>则为真正的共享内存。<code>init</code>为初始化函数的入口地址。<code>tag</code>则为一个标记指针。</p>
+
+<h2>提供初始化函数</h2>
+
+<p>上节所提及的<code>init</code>通过如下函数进行实现：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="n">ngx_int_t</span> <span class="nf">ngx_http_hello_world_init_shm_zone</span><span class="p">(</span><span class="n">ngx_shm_zone_t</span> <span class="o">*</span><span class="n">shm_zone</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">){</span>
+</span><span class='line'>  <span class="cm">/*  ...  */</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">data</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">shm_zone</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">NGX_OK</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="cm">/*  ...  */</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">NGX_OK</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>调用添加共享内存(<code>ngx_shared_memory_add</code>)函数</h2>
+
+<p><code>ngx_shared_memory_add</code>函数为<code>shm_zone_t</code>分配内存，函数声明如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">ngx_shm_zone_t</span> <span class="o">*</span>
+</span><span class='line'><span class="nf">ngx_shared_memory_add</span><span class="p">(</span><span class="n">ngx_conf_t</span> <span class="o">*</span><span class="n">cf</span><span class="p">,</span> <span class="n">ngx_str_t</span> <span class="o">*</span><span class="n">name</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span>
+</span><span class='line'>            <span class="kt">void</span> <span class="o">*</span><span class="n">tag</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>一般在模块command入口或配置创建入口进行分配，该函数需要四个参数，<code>cf</code>为对应配置的上下文，<code>name</code>为共享内存的名称，如果已经存在相同名称的内存，则不会创建新的内存，直接返回此内存，<code>size</code>为此共享内存大小，一般来说为内存页大小的倍数即可，<code>tag</code>为标记，在模块中使用模块的指针做为<code>tag</code>。创建完该内存后，就应当配置共享内存的init入口和在配置中的初始化。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">shm_name</span> <span class="o">=</span> <span class="n">ngx_palloc</span><span class="p">(</span><span class="n">cf</span><span class="o">-&gt;</span><span class="n">pool</span><span class="p">,</span> <span class="k">sizeof</span> <span class="o">*</span><span class="n">shm_name</span><span class="p">);</span>
+</span><span class='line'><span class="n">shm_name</span><span class="o">-&gt;</span><span class="n">len</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="s">&quot;shared_memory&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="n">shm_name</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="p">)</span> <span class="s">&quot;shared_memory&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="n">shm_zone</span> <span class="o">=</span> <span class="n">ngx_shared_memory_add</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">shm_name</span><span class="p">,</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">ngx_pagesize</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ngx_http_hello_world_module</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">shm_zone</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">){</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">NGX_CONF_ERROR</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">shm_zone</span><span class="o">-&gt;</span><span class="n">init</span> <span class="o">=</span> <span class="n">ngx_http_hello_world_init_shm_zone</span><span class="p">;</span>
+</span><span class='line'><span class="n">conf</span><span class="o">-&gt;</span><span class="n">shm_zone</span> <span class="o">=</span> <span class="n">shm_zone</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>使用slab分配内存</h1>
+
+<p>在<code>init</code>函数中，需要将实用的内存进行初始化，则需要<code>ngx_slab_alloc</code>函数进行分配，完善后的<code>init</code>函数如下：</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="k">static</span> <span class="n">ngx_int_t</span> <span class="nf">ngx_http_hello_world_init_shm_zone</span><span class="p">(</span><span class="n">ngx_shm_zone_t</span> <span class="o">*</span><span class="n">shm_zone</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">data</span><span class="p">){</span>
+</span><span class='line'>  <span class="n">ngx_slab_pool_t</span> <span class="o">*</span><span class="n">shpool</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">ngx_http_hello_world_shm_count_t</span> <span class="o">*</span><span class="n">shm_count</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">data</span><span class="p">){</span>
+</span><span class='line'>    <span class="n">shm_zone</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">NGX_OK</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="n">shpool</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngx_slab_pool_t</span> <span class="o">*</span><span class="p">)</span><span class="n">shm_zone</span><span class="o">-&gt;</span><span class="n">shm</span><span class="p">.</span><span class="n">addr</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">shm_count</span> <span class="o">=</span> <span class="n">ngx_slab_alloc</span><span class="p">(</span><span class="n">shpool</span><span class="p">,</span> <span class="k">sizeof</span> <span class="o">*</span><span class="n">shm_count</span><span class="p">);</span>
+</span><span class='line'>  <span class="n">shm_count</span><span class="o">-&gt;</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">shm_zone</span><span class="o">-&gt;</span><span class="n">data</span> <span class="o">=</span> <span class="n">shm_count</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">NGX_OK</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>从<code>shm_zone</code>中获取共享内存的地址做为内存池，然后调用<code>ngx_slab_alloc</code>函数从此内存池中分配一块所需的内存，再对这块内存进行初始化。</p>
+
+<p>除了<code>ngx_slab_alloc</code>来分配内存，我们还需要<code>ngx_slab_free</code>函数进行内存的释放。</p>
+
+<h1>内存的原子访问</h1>
+
+<p>在多进程中同时访问一块内存是非常危险的一件事情。Nginx的API也提供了原子锁机制(<code>shpool-&gt;mutex</code>)来保证内存的一致性。Nginx提供了<code>ngx_shmtx_lock(&amp;shpool-&gt;mutex)</code>和<code>ngx_shmtx_ulock(&amp;shpool-&gt;mutex)</code>对锁进行操作。如果进行分配内存、销毁内存时，就需要用到锁进行操作。因为<code>mutex</code>互斥锁使用spinlocks实现，很容易用掉100%的CPU，所以不要在获得<code>mutex</code>互斥锁的时候，执行一些耗时较长的操作。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='c'><span class='line'><span class="n">shpool</span> <span class="o">=</span> <span class="p">(</span><span class="n">ngx_slab_pool_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">lccf</span><span class="o">-&gt;</span><span class="n">shm_zone</span><span class="o">-&gt;</span><span class="n">shm</span><span class="p">.</span><span class="n">addr</span><span class="p">;</span>
+</span><span class='line'><span class="n">ngx_shmtx_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">shpool</span><span class="o">-&gt;</span><span class="n">mutex</span><span class="p">);</span>
+</span><span class='line'><span class="n">new_block</span> <span class="o">=</span> <span class="n">ngx_slab_alloc_locked</span><span class="p">(</span><span class="n">shpool</span><span class="p">,</span> <span class="n">ngx_pagesize</span><span class="p">);</span>
+</span><span class='line'><span class="n">ngx_shmtx_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">shpool</span><span class="o">-&gt;</span><span class="n">mutex</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[2015技术总结]]></title>
     <link href="http://blog.friparia.com/blog/2016/01/21/tech-summary/"/>
     <updated>2016-01-21T15:51:42+08:00</updated>
     <id>http://blog.friparia.com/blog/2016/01/21/tech-summary</id>
-    <content type="html"><![CDATA[<p>这一年也接近尾声了，也专注写了不少代码，中间有很多尝试，也有很多觉得有意义的地方值得记录一下，顺便半年没写 Blog 了，也刷下存在感（虽然本来就没有）</p>
+    <content type="html"><![CDATA[<p>这一年也接近尾声了，也专注写了不少代码，中间有很多尝试，也有很多觉得有意义的地方值得记录一下，顺便半年没写 Blog 了，也刷下存在感 (虽然本来就没有)</p>
 
 <!--more-->
 
 
 <p>寒假在家的时候没事研究了一阵 Laravel 的代码，顺手修了一个 Bug, 感觉对 Laravel 的设计思想有了一些更深入的理解，但是后来的项目中也没有用过这个框架了，原本还想再开发几个 Laravel 的小插件，也不了了之了，算是一个不小的遗憾:)</p>
 
-<p>回到学校的时候研究了一下 Excel 的文件结构，只了解了一下旧版本的 Excel 2003 的文件，看了很多 Microsoft 的文档，尤其是和 Compound File 有关的，对 Excel 有了更多的理解，也按照文档和理解写了一个 PHP 的 Excel 的扩展，用来快速读取一个 Excel 2003 文件，目的是为了提供一个比 PHPExcel 更加快速的读取方案，实践效果还是不错的，比 PHPExcel 快千倍（因为是纯 c 写的嘛），地址在这里 <a href="https://github.com/friparia/php-fast-excel">php-fast-excel</a>，但是也是由于最后项目里没有更多的需求了，所以也没有再更新 Todo List 上面的事情了。但是在其它多个项目中有用到另一个 Excel 的扩展 <a href="https://github.com/friparia/php_fast_xlsxwriter">php_fast_xlsxwriter</a>，这个是用来导出为一个 Excel 07 版本的文档，利用了 xlsxwriter 的 c 库，封装成了一个 PHP 的扩展，实践证明，比 PHPExcel 运行的速度快很多，基本上瞬间就出来结果了。</p>
+<p>回到学校的时候研究了一下 Excel 的文件结构，只了解了一下旧版本的 Excel 2003 的文件，看了很多 Microsoft 的文档，尤其是和 Compound File 有关的，对 Excel 有了更多的理解，也按照文档和理解写了一个 PHP 的 Excel 的扩展，用来快速读取一个 Excel 2003 文件，目的是为了提供一个比 PHPExcel 更加快速的读取方案，实践效果还是不错的，比 PHPExcel 快千倍 (因为是纯c写的嘛)，地址在这里 <a href="https://github.com/friparia/php-fast-excel">php-fast-excel</a>，但是也是由于最后项目里没有更多的需求了，所以也没有再更新 Todo List 上面的事情了。但是在其它多个项目中有用到另一个 Excel 的扩展 <a href="https://github.com/friparia/php_fast_xlsxwriter">php_fast_xlsxwriter</a>，这个是用来导出为一个 Excel 07 版本 (.xlsx) 的文档，利用了 xlsxwriter 的 c 库，封装成了一个 PHP 的扩展，实践证明，比 PHPExcel 运行的速度快很多，基本上瞬间就出来结果了。</p>
 
 <p>由于有了两次写 PHP 扩展的经历，然后就在春天去了次 PHPCon，去听了 PHP 在实际业务中的一些应用，也从鸟哥那里了解了 PHP 7 的新特性，以及一些关键点的实现，讲实在的，去听了下还是受益匪浅的。</p>
 
 <p>后来的大部分时间都是在做业务方面的东西，从理解业务到实现这个业务，在这个过程中，有尝试着去使用设计模式。发现有的时候良好的设计会给未来维护带来很大的方便，如果设计的够通用的话，有的新业务也可以用旧业务的框架进行实现，实现了事半功倍的效果。但是，有时候这也会是个双刃剑，因为业务总不可能按照一开始的设计走，所以可能有多余的设计，这一点是要注意并且避免的。所幸的是，这一年的设计基本上满足了大多数需求，也给自己省了不少工作量。但是，由于自身的不成熟，导致了这些东西只能够为自己所使用，争取在明年以及未来的设计中，能够更易用，而且能够有让其他人很容易上手的框架设计方案。</p>
 
-<p>其实四月份的时候就立了另一个 iOS 的项目，因为也是第一次完整的做一个 GUI 的项目（以前做的一个纯粹是 Win32 API + BMP 图的实现），所以拖到了现在，才把功能做完，还有一些细节方面的美化，可能要到过年完后才能看到这个 App。这中间在十一我回家的时候经历了一次重构，由原先的随便拼 ViewController 的方案，改成了一个逻辑比较清晰的，后来加功能的时候也方便了很多，然后就是十二月的时候做了一下图文混排的实现，利用了 YYText 的库，发现国人做的一些开源项目已经很不错了。在做 iOS 项目的时候暴露出自己很多方面的不足，尤其是多线程，以及 UI 渲染实践的匮乏，只懂得理论，而这一次刚好是一个很好的机会，从异步多线程到 UI 渲染，都有了一次极大的理解和提升。</p>
+<p>其实四月份的时候就立了另一个 iOS 的项目，因为也是第一次完整的做一个 GUI 的项目 (以前做的一个纯粹是 Win32 API + BMP 图的实现)，所以拖到了现在，才把功能做完，还有一些细节方面的美化，可能要到过年完后才能看到这个 App。这中间在十一我回家的时候经历了一次重构，由原先的随便拼 ViewController 的方案，改成了一个逻辑比较清晰的，后来加功能的时候也方便了很多，然后就是十二月的时候做了一下图文混排的实现，利用了 YYText 的库，发现国人做的一些开源项目已经很不错了。在做 iOS 项目的时候暴露出自己很多方面的不足，尤其是多线程，以及 UI 渲染实践的匮乏，只懂得理论，而这一次刚好是一个很好的机会，从异步多线程到 UI 渲染，都有了一次极大的理解和提升。</p>
 
 <p>除了在技术方面的工作之外，在经历过几次“见世面”和“坑人及被坑”后，发现有好多地方还有很大的学习空间，不仅仅要在技术能力上下功夫，更应该在为人处世上有所注意和提升。</p>
 
 <h2>展望</h2>
 
-<p>技术方面，尽可能往更深层次走，PHP 经常被黑是因为它实在是太过于简单了，争取明年对 PHP 7 的内核有一个深入的理解；框架设计方面，尽可能做到易于他人理解，易于多人使用，更多的减少重复工作量，尽可能将系统做成可配置管理的，而不是写死在代码中的；加深对 UI 以及多线程编程的理解，争取能够再重构一下 iOS 的代码，用一些比较好的思想（ Promise 什么的），来使得已经臃肿的代码更简洁、更易读；算法方面，以前都是有心情做一做，明年还是争取有个目标出来，翻了下算法导论发现八成已经学过了，争取多做做题，保持一种能做出题的状态来。并且多总结一些经验更新博客吧= =这都半年没写了，以前的也都写的是皮毛，总之文字和表述能力还需要加强。</p>
+<p>技术方面，尽可能往更深层次走，PHP 经常被黑是因为它实在是太过于简单了，争取明年对 PHP 7 的内核有一个深入的理解；框架设计方面，尽可能做到易于他人理解，易于多人使用，更多的减少重复工作量，尽可能将系统做成可配置管理的，而不是写死在代码中的；加深对 UI 以及多线程编程的理解，争取能够再重构一下 iOS 的代码，用一些比较好的思想 (例如 Reactive 或者 Promise)，来使得已经臃肿的代码更简洁、更易读；算法方面，以前都是有心情做一做，明年还是争取有个目标出来，(翻了下算法导论发现 80% 已经学过了，争取多做做题，保持一种能做出题的状态来)。并且多总结一些经验更新博客吧= =这都半年没写了，以前的也都写的是皮毛，总之文字和表述能力还需要加强。</p>
 
 <p>非技术方面，争取有个女朋友:)</p>
 ]]></content>
@@ -408,8 +573,8 @@
 <p>有任何问题可以通过以下方式联系我:</p>
 
 <ul>
-<li><p>邮箱:<a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#102;&#x72;&#105;&#x70;&#97;&#x72;&#x69;&#x61;&#64;&#103;&#x6d;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#109;">&#x66;&#114;&#105;&#112;&#x61;&#x72;&#x69;&#x61;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;</a></p></li>
-<li><p>irc:<a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#x66;&#114;&#x69;&#x70;&#97;&#114;&#x69;&#97;&#64;&#x69;&#114;&#x63;&#x2e;&#x66;&#114;&#x65;&#101;&#110;&#111;&#x64;&#x65;&#46;&#110;&#101;&#x74;">&#x66;&#114;&#x69;&#112;&#x61;&#x72;&#x69;&#x61;&#64;&#105;&#x72;&#99;&#x2e;&#102;&#114;&#x65;&#101;&#110;&#111;&#x64;&#101;&#x2e;&#x6e;&#101;&#x74;</a></p></li>
+<li><p>邮箱:<a href="&#109;&#97;&#x69;&#108;&#x74;&#111;&#x3a;&#102;&#x72;&#105;&#x70;&#x61;&#114;&#105;&#x61;&#x40;&#103;&#x6d;&#97;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;">&#102;&#114;&#105;&#x70;&#97;&#x72;&#105;&#97;&#64;&#103;&#109;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#x6d;</a></p></li>
+<li><p>irc:<a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#x3a;&#x66;&#114;&#x69;&#x70;&#x61;&#114;&#x69;&#97;&#64;&#x69;&#114;&#99;&#x2e;&#x66;&#114;&#x65;&#x65;&#x6e;&#x6f;&#x64;&#101;&#46;&#110;&#x65;&#116;">&#102;&#114;&#105;&#112;&#x61;&#x72;&#105;&#97;&#x40;&#x69;&#x72;&#x63;&#46;&#x66;&#114;&#x65;&#101;&#110;&#111;&#x64;&#101;&#46;&#110;&#101;&#x74;</a></p></li>
 </ul>
 
 ]]></content>

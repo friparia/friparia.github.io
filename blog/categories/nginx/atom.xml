@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Nginx | Friparia Blog]]></title>
+  <link href="http://blog.friparia.com/blog/categories/nginx/atom.xml" rel="self"/>
+  <link href="http://blog.friparia.com/"/>
+  <updated>2017-02-27T17:20:37+08:00</updated>
+  <id>http://blog.friparia.com/</id>
+  <author>
+    <name><![CDATA[Friparia]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Nginx高级编程：在模块中使用共享内存]]></title>
+    <link href="http://blog.friparia.com/blog/2017/02/27/using-shared-memory-in-nginx/"/>
+    <updated>2017-02-27T10:02:23+08:00</updated>
+    <id>http://blog.friparia.com/blog/2017/02/27/using-shared-memory-in-nginx</id>
+    <content type="html"><![CDATA[<p>Nginx是由多个worker进程运行的，所以这些进程之间可以通过共享内存进行通信或完成一些进程间的工作，例如将用户session存储至nginx的内存中以提升运行效率等。Nginx提供了共享内存的API，由于其master-worker的模式，使得共享内存的使用和其与标准的内存分配略有不同。本文所使用的代码在这<a href="https://github.com/friparia/nginx-shared-memory-module">nginx-shared-memory-module</a>，测试开发环境为nginx 1.10.1。本文参考了<a href="http://www.evanmiller.org/nginx-modules-guide-advanced.html">Emiller&rsquo;s Advanced Topics In Nginx Module Development</a>。</p>
+
+<!--more-->
+
+
+<h1>创建并使用共享内存段(shared memory segment)</h1>
+
+<h2>注册共享内存的存储</h2>
+
+<p>和普通的模块开发类似，将所需的变量存储至配置的上下文中(可能会有更好的读取访问的位置)，结构体定义如下:</p>
+
+<p><code>c
+typedef struct{
+  ngx_shm_zone_t *shm_zone;
+} ngx_http_hello_world_loc_conf_t;
+</code></p>
+
+<p>其中使用了<code>ngx_shm_zone_t</code>结构体，即一个共享内存区，其声明如下：</p>
+
+<p><code>c
+struct ngx_shm_zone_s {
+  void *data;
+  ngx_shm_t shm;
+  ngx_shm_zone_init_pt init;
+  void *tag;
+};
+</code></p>
+
+<p><code>data</code>即共享内存中的自定义数据结构，初始化时使用。<code>shm</code>则为真正的共享内存。<code>init</code>为初始化函数的入口地址。<code>tag</code>则为一个标记指针。</p>
+
+<h2>提供初始化函数</h2>
+
+<p>上节所提及的<code>init</code>通过如下函数进行实现：</p>
+
+<p>```c
+static ngx_int_t ngx_http_hello_world_init_shm_zone(ngx_shm_zone_t <em>shm_zone, void </em>data){
+  /<em>  &hellip;  </em>/
+  if(data){</p>
+
+<pre><code>shm_zone-&gt;data = data;
+return NGX_OK;
+</code></pre>
+
+<p>  }
+  /<em>  &hellip;  </em>/
+  return NGX_OK;
+}
+```</p>
+
+<h2>调用添加共享内存(<code>ngx_shared_memory_add</code>)函数</h2>
+
+<p><code>ngx_shared_memory_add</code>函数为<code>shm_zone_t</code>分配内存，函数声明如下：</p>
+
+<p>```c
+ngx_shm_zone_t *
+ngx_shared_memory_add(ngx_conf_t <em>cf, ngx_str_t </em>name, size_t size,</p>
+
+<pre><code>        void *tag);
+</code></pre>
+
+<p>```</p>
+
+<p>一般在模块command入口或配置创建入口进行分配，该函数需要四个参数，<code>cf</code>为对应配置的上下文，<code>name</code>为共享内存的名称，如果已经存在相同名称的内存，则不会创建新的内存，直接返回此内存，<code>size</code>为此共享内存大小，一般来说为内存页大小的倍数即可，<code>tag</code>为标记，在模块中使用模块的指针做为<code>tag</code>。创建完该内存后，就应当配置共享内存的init入口和在配置中的初始化。</p>
+
+<p>```c
+shm_name = ngx_palloc(cf->pool, sizeof <em>shm_name);
+shm_name->len = sizeof(&ldquo;shared_memory&rdquo;) &ndash; 1;
+shm_name->data = (unsigned char </em>) &ldquo;shared_memory&rdquo;;
+shm_zone = ngx_shared_memory_add(cf, shm_name, 8 * ngx_pagesize, &amp;ngx_http_hello_world_module);</p>
+
+<p>if(shm_zone == NULL){
+  return NGX_CONF_ERROR;
+}</p>
+
+<p>shm_zone->init = ngx_http_hello_world_init_shm_zone;
+conf->shm_zone = shm_zone;
+```</p>
+
+<h1>使用slab分配内存</h1>
+
+<p>在<code>init</code>函数中，需要将实用的内存进行初始化，则需要<code>ngx_slab_alloc</code>函数进行分配，完善后的<code>init</code>函数如下：</p>
+
+<p>```c
+static ngx_int_t ngx_http_hello_world_init_shm_zone(ngx_shm_zone_t <em>shm_zone, void </em>data){
+  ngx_slab_pool_t <em>shpool;
+  ngx_http_hello_world_shm_count_t </em>shm_count;
+  if(data){</p>
+
+<pre><code>shm_zone-&gt;data = data;
+return NGX_OK;
+</code></pre>
+
+<p>  }
+  shpool = (ngx_slab_pool_t <em>)shm_zone->shm.addr;
+  shm_count = ngx_slab_alloc(shpool, sizeof </em>shm_count);
+  shm_count->count = 0;
+  shm_zone->data = shm_count;
+  return NGX_OK;
+}
+```</p>
+
+<p>从<code>shm_zone</code>中获取共享内存的地址做为内存池，然后调用<code>ngx_slab_alloc</code>函数从此内存池中分配一块所需的内存，再对这块内存进行初始化。</p>
+
+<p>除了<code>ngx_slab_alloc</code>来分配内存，我们还需要<code>ngx_slab_free</code>函数进行内存的释放。</p>
+
+<h1>内存的原子访问</h1>
+
+<p>在多进程中同时访问一块内存是非常危险的一件事情。Nginx的API也提供了原子锁机制(<code>shpool-&gt;mutex</code>)来保证内存的一致性。Nginx提供了<code>ngx_shmtx_lock(&amp;shpool-&gt;mutex)</code>和<code>ngx_shmtx_ulock(&amp;shpool-&gt;mutex)</code>对锁进行操作。如果进行分配内存、销毁内存时，就需要用到锁进行操作。因为<code>mutex</code>互斥锁使用spinlocks实现，很容易用掉100%的CPU，所以不要在获得<code>mutex</code>互斥锁的时候，执行一些耗时较长的操作。</p>
+
+<p><code>c
+shpool = (ngx_slab_pool_t *) lccf-&gt;shm_zone-&gt;shm.addr;
+ngx_shmtx_lock(&amp;shpool-&gt;mutex);
+new_block = ngx_slab_alloc_locked(shpool, ngx_pagesize);
+ngx_shmtx_unlock(&amp;shpool-&gt;mutex);
+</code></p>
+]]></content>
+  </entry>
+  
+</feed>

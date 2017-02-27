@@ -108,6 +108,46 @@
   
       
     
+    <h1><a href="/blog/2017/02/27/using-shared-memory-in-nginx/">Nginx高级编程：在模块中使用共享内存</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2017-02-27T10:02:23+08:00" pubdate data-updated="true">Feb 27<span>th</span>, 2017</time>
+        
+           | <a href="/blog/2017/02/27/using-shared-memory-in-nginx/#disqus_thread"
+             data-disqus-identifier="http://blog.friparia.com/blog/2017/02/27/using-shared-memory-in-nginx/">Comments</a>
+        
+      </p>
+    
+
+
+
+  <div><p>Nginx是由多个worker进程运行的，所以这些进程之间可以通过共享内存进行通信或完成一些进程间的工作，例如将用户session存储至nginx的内存中以提升运行效率等。Nginx提供了共享内存的API，由于其master-worker的模式，使得共享内存的使用和其与标准的内存分配略有不同。本文所使用的代码在这<a href="https://github.com/friparia/nginx-shared-memory-module">nginx-shared-memory-module</a>，测试开发环境为nginx 1.10.1。本文参考了<a href="http://www.evanmiller.org/nginx-modules-guide-advanced.html">Emiller&rsquo;s Advanced Topics In Nginx Module Development</a>。</p>
+
+</div>
+  
+  
+      <a href="/blog/2017/02/27/using-shared-memory-in-nginx/">Read more</a>
+  
+
+
+    <hr class="blog-post-sep">
+  
+  
+      
+    
     <h1><a href="/blog/2016/01/21/tech-summary/">2015技术总结</a></h1>
     
     
@@ -134,7 +174,7 @@
 
 
 
-  <div><p>这一年也接近尾声了，也专注写了不少代码，中间有很多尝试，也有很多觉得有意义的地方值得记录一下，顺便半年没写 Blog 了，也刷下存在感（虽然本来就没有）</p>
+  <div><p>这一年也接近尾声了，也专注写了不少代码，中间有很多尝试，也有很多觉得有意义的地方值得记录一下，顺便半年没写 Blog 了，也刷下存在感 (虽然本来就没有)</p>
 
 </div>
   
@@ -482,6 +522,10 @@
   <ul class="nav sidebar-categories margin-bottom-40" id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/02/27/using-shared-memory-in-nginx/">Nginx高级编程：在模块中使用共享内存</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/01/21/tech-summary/">2015技术总结</a>
       </li>
     
@@ -495,10 +539,6 @@
     
       <li class="post">
         <a href="/blog/2015/03/24/access-control-part-one/">信息系统中的权限控制(一)：基于业务逻辑</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/25/what-happened-after-typing-url-in-your-browser/">你在浏览器里面输入网址后都发生了什么</a>
       </li>
     
   </ul>
@@ -546,7 +586,7 @@
     <div class="row">
       <div class="col-md-8">
         <p>
-        <span class="margin-right-10">2016 - Friparia ALL Rights Reserved.</span> 
+        <span class="margin-right-10">2017 - Friparia ALL Rights Reserved.</span> 
         </p>
       </div>
       <div class="col-md-4">
